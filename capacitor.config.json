@@ -1,0 +1,13 @@
+{
+  "appId": "com.medicoman.app",
+  "appName": "Medico Man",
+  "webDir": "www",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "force"
+  },
+  "plugins": {
+    "SystemBars": {
+      "style": "LIGHT"
+    }
+  }
+}
