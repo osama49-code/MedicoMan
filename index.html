@@ -528,6 +528,19 @@ body.rm-on .page-jumpers{bottom:88px}
 .rm-bar button{flex-direction:row;justify-content:center;padding:10px 4px;font-size:13.5px}
 body.rm-on{padding-bottom:60px}
 body.rm-on .page-jumpers{bottom:68px}
+
+.lib-fold{margin-top:10px}
+.lib-fold .lib-list{padding:6px 10px 10px}
+.info-btn{display:none;align-items:center;justify-content:center;width:20px;height:20px;margin-inline-start:6px;border-radius:50%;border:1px solid var(--accent-dark);background:var(--expl-bg);color:var(--expl-label);font:700 12px/1 Georgia,serif;cursor:pointer;vertical-align:middle;padding:0}
+#tool-recallman.detailed .info-btn{display:inline-flex}
+.info-ov{display:none;position:fixed;inset:0;z-index:300;background:rgba(11,28,44,.4);align-items:center;justify-content:center;padding:16px}
+.info-ov.open{display:flex}
+.info-card{position:relative;width:100%;max-width:440px;max-height:80vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 18px 48px rgba(11,28,44,.25);padding:18px 18px 8px}
+.info-card h3{margin:0 0 12px;padding-inline-end:34px;font-size:16px;color:var(--ink)}
+.info-x{position:absolute;top:10px;inset-inline-end:10px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-size:14px}
+.info-it{padding:10px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.8;color:var(--ink)}
+.info-it b{display:block;color:var(--expl-label)}
+.info-it span{display:block;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -572,7 +585,7 @@ body.rm-on .page-jumpers{bottom:68px}
       <input type="file" id="libFileInput" accept=".txt,.md,.pdf,.docx,.jpg,.jpeg,.png" multiple>
       <span class="status" id="libStatus"></span>
     </div>
-    <div class="lib-list" id="libList"><div class="lib-empty">لا توجد ملفات محفوظة بعد.</div></div>
+    <details class="rule-grp lib-fold" id="libFold"><summary id="libSum">الملفات المحفوظة (0)</summary><div class="lib-list" id="libList"><div class="lib-empty">لا توجد ملفات محفوظة بعد.</div></div></details>
   </div>
   <div class="home-tools-label">Tools</div>
   <div class="tools-grid" id="toolsGrid">
@@ -624,7 +637,7 @@ body.rm-on .page-jumpers{bottom:68px}
   <div class="card">
     <h2>الإعدادات</h2>
     <div class="difficulty-wrap">
-      <label>مستوى الصعوبة</label>
+      <label>مستوى الصعوبة <button type="button" class="info-btn" onclick="showInfo('difficulty')" aria-label="إرشادات" title="إرشادات">i</button></label>
       <select id="difficulty">
         <option value="adaptive">متنوع</option>
         <option value="basic">سهل</option>
@@ -634,12 +647,12 @@ body.rm-on .page-jumpers{bottom:68px}
       </select>
     </div>
     <div class="dtl">
-      <div class="difficulty-wrap"><label>تركيز الأسئلة</label><select id="rmFocus">
+      <div class="difficulty-wrap"><label>تركيز الأسئلة <button type="button" class="info-btn" onclick="showInfo('focus')" aria-label="إرشادات" title="إرشادات">i</button></label><select id="rmFocus">
         <option value="comprehensive">شامل: أهم المواضع + التفاصيل الدقيقة</option>
         <option value="core">الأكثر تكرارًا في الامتحانات</option>
         <option value="traps">صيد الفخاخ والتفاصيل الدقيقة</option>
         <option value="differential">التفريق بين المتشابهات والتدبير</option></select></div>
-      <div class="difficulty-wrap"><label>عمق الشرح</label><select id="rmDepth">
+      <div class="difficulty-wrap"><label>عمق الشرح <button type="button" class="info-btn" onclick="showInfo('depth')" aria-label="إرشادات" title="إرشادات">i</button></label><select id="rmDepth">
         <option value="full">شرح كامل (4 أجزاء)</option><option value="short">شرح مختصر للمراجعة السريعة</option></select></div>
       <div class="difficulty-wrap"><label>ملاحظة خاصة بهذه الدفعة</label><input type="text" id="rmNote" placeholder="مثال: ركّز على الجرعات وأسئلة الدكتور"></div>
       <label>توزيع جاهز للأعداد</label>
@@ -802,6 +815,7 @@ body.rm-on .page-jumpers{bottom:68px}
 </div>
 
 
+<div class="info-ov" id="infoOv" onclick="if(event.target===this)infoClose()"><div class="info-card" role="dialog" aria-modal="true"><button type="button" class="info-x" onclick="infoClose()" aria-label="إغلاق">✕</button><h3 id="infoT"></h3><div id="infoB"></div></div></div>
 <nav class="rm-bar" id="rmBar"><button type="button" id="rmT_home" class="on" onclick="rmTab('home')">الرئيسية</button><button type="button" id="rmT_res" onclick="rmTab('res')">النتائج</button><button type="button" id="rmT_lib" onclick="rmTab('lib')">المكتبة</button></nav>
 <script>
 /* ============================================================
@@ -810,7 +824,7 @@ body.rm-on .page-jumpers{bottom:68px}
    ============================================================ */
 
 /* ===== 1) الثوابت ===== */
-const VERSION = 'V5';
+const VERSION = 'V7';
 // تسجيل الأدوات: أداة جديدة = عنصر هنا + <div class="wrap view-hidden" id="tool-ID"> في الصفحة
 const TOOLS = [
   {id:'recallman', icon:'🧠', name:'RecallMan', desc:'حوّل محاضراتك إلى أسئلة متنوعة وبطاقات مراجعة بمستوى صعوبة تختاره.'},
@@ -1085,6 +1099,32 @@ document.addEventListener('keydown', e => {
   else if((e.key === ' ' || e.key === 'Enter') && cs[deckIdx]){ e.preventDefault(); cs[deckIdx].click(); }
 });
 
+/* ===== بطاقة الإرشادات ===== */
+const INFO = {
+  difficulty: ['مستوى الصعوبة', [
+    ['متنوع', 'يوزّع الأسئلة بين التأسيسي والتطبيقي والاستنتاجي والفخاخ.', 'تدرّج متوازن يناسب أول مراجعة للمحاضرة.'],
+    ['سهل', 'حقائق وتعريفات وتصنيفات وخطوط أولى.', 'تثبيت الأساسيات قبل الانتقال لما هو أصعب.'],
+    ['متوسط', 'أسئلة «ليه وإزاي» وربط المعلومة بموقف.', 'يختبر الفهم وليس الحفظ فقط.'],
+    ['صعب', 'ربط بين أجزاء متباعدة وسؤال عن الآلية والاستثناء والخطوة التالية.', 'يجهّزك للأسئلة المركّبة والمواقف الصعبة.'],
+    ['أسئلة سريرية', 'صياغة الأسئلة على هيئة حالة مريض مع أفضل خطوة تالية وأرجح تشخيص.', 'تدريب مباشر على أسلوب البورد.']]],
+  focus: ['تركيز الأسئلة', [
+    ['شامل', '70% مواضع الامتحان المعروفة (مقارنات، خط أول، علامات مميزة، موانع) و30% تفاصيل دقيقة واستثناءات.', 'تغطية متوازنة للمحاضرة كلها.'],
+    ['الأكثر تكرارًا', '85% من المواضع التي لا يخلو منها امتحان و15% لأهم استثناءاتها.', 'الأنسب لوقت ضيق قبل الامتحان.'],
+    ['صيد الفخاخ', 'فخاخ واستثناءات وتشابه لفظي مضلل، وأسئلة تبدو مألوفة وفيها تفصيلة تقلب الإجابة.', 'يرفع دقتك بعد أول مراجعة.'],
+    ['التفريق والتدبير', 'أسئلة عن الفرق بين المتشابهات وترتيب الخطوات (ماذا تفعل أولًا؟).', 'يقوّي القرار السريري والتمييز بين الحالات.']]],
+  depth: ['عمق الشرح', [
+    ['شرح كامل', 'أربعة أجزاء: مفتاح الحل والقرينة، الآلية العلمية، سبب خطأ كل بديل، وفخ الامتحان.', 'تفهم لماذا أخطأت وتتجنب الفخ مرة أخرى.'],
+    ['شرح مختصر', 'ثلاث نقاط: سبب صحة الإجابة، استبعاد أقرب بديلين، وخلاصة امتحانية.', 'مراجعة سريعة ليلة الامتحان.']]]
+};
+function showInfo(k){
+  const [t, items] = INFO[k];
+  $('infoT').textContent = t;
+  $('infoB').innerHTML = items.map(i => `<div class="info-it"><b>${i[0]}</b>${i[1]}<span>الميزة: ${i[2]}</span></div>`).join('');
+  $('infoOv').classList.add('open');
+}
+function infoClose(){ $('infoOv').classList.remove('open'); }
+document.addEventListener('keydown', e => { if(e.key === 'Escape') infoClose(); });
+
 /* ===== 2) الحالة ===== */
 let uploadedImage = null, genLang = 'en', activeTab = 'mcq', lastParsed = null, toastTimer = null, currentTool = null;
 let resultsCache = {ar:null, en:null, mixed:null};
@@ -1145,10 +1185,20 @@ window.addEventListener('popstate', e => {
 
 /* ===== زر الرجوع في تطبيق الأندرويد ===== */
 (function(){
-  const back = () => history.back();
-  try{ const A = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App; if(A && A.addListener) A.addListener('backButton', back); }catch(e){}
-  document.addEventListener('backbutton', back, false);   // Cordova
+  try{ const A = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App; if(A && A.addListener) A.addListener('backButton', appBack); }catch(e){}
+  document.addEventListener('backbutton', appBack, false);   // Cordova
 })();
+function appBack(){
+  // الرجوع في تطبيق الأندرويد: يتحكم فيه الكود مباشرة (من غير الاعتماد على سجل المتصفح)
+  if($('infoOv').classList.contains('open')){ infoClose(); return; }
+  const menu = $('toolsMenu');
+  if(menu && menu.classList.contains('open')){ closeToolsMenu(); return; }
+  if(currentTool === 'recallman' && $('rmBody').style.display !== 'none' && rmCur !== 'home'){ rmTab('home', true); return; }
+  if(currentTool){ showView(null); return; }
+  if(exitArmed){ appExit(); return; }
+  exitArmed = true; clearTimeout(exitT); exitT = setTimeout(() => exitArmed = false, 2000);
+  showToast('اضغط مرة أخرى للخروج');
+}
 function appExit(){
   try{ const A = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App; if(A && A.exitApp) return A.exitApp(); }catch(e){}
   try{ if(navigator.app && navigator.app.exitApp) return navigator.app.exitApp(); }catch(e){}
@@ -1328,8 +1378,10 @@ async function libRender(){
   const list = $('libList'), pick = $('libPickSelect');
   if(!list) return;
   let items = [];
+  const setSum = n => { const s = $('libSum'); if(s) s.textContent = 'الملفات المحفوظة (' + n + ')'; };
   try{ items = await libAll(); } catch(e){ list.innerHTML = '<div class="lib-empty">تعذّر فتح المكتبة.</div>'; return; }
   items.sort((a,b) => (a.id||0) - (b.id||0));
+  setSum(items.length);
   list.innerHTML = items.length
     ? items.map((f, i) => `<div class="lib-item" data-id="${f.id}">
         <span class="lib-num">${i+1}</span>
