@@ -513,6 +513,21 @@ body.dark-mode .bg-ambient span:nth-child(4){background:rgba(163,230,53,.08);}
 .rm-bar button span{font-size:18px}
 body.rm-on{padding-bottom:78px}
 body.rm-on .page-jumpers{bottom:88px}
+
+.mode-card{text-align:center}
+.mode-bar{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 14px;margin:0 0 14px}
+.mode-name{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--ink)}
+.mode-name::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--grad-accent)}
+.rule-main>summary{background:var(--expl-bg);color:var(--expl-label);border-radius:var(--radius-sm)}
+.tools-menu-subs{margin:2px 0 4px;margin-inline-start:20px;padding-inline-start:8px;border-inline-start:2px solid var(--line-strong)}
+.tools-menu-subs .tools-menu-item{position:relative;padding:7px 10px;font-size:.84rem;color:var(--teal);background:rgba(13,148,136,.07);margin-top:3px}
+.tools-menu-subs .tools-menu-item::before{content:'';position:absolute;inset-inline-start:-10px;top:50%;width:8px;height:2px;background:var(--line-strong)}
+.tools-menu-subs .tools-menu-item:hover{background:rgba(13,148,136,.14)}
+.tools-menu-subs .tools-menu-item.active-tool{background:rgba(163,230,53,.22);color:var(--ink)}
+.rm-bar{padding:4px 8px calc(4px + env(safe-area-inset-bottom));gap:4px}
+.rm-bar button{flex-direction:row;justify-content:center;padding:10px 4px;font-size:13.5px}
+body.rm-on{padding-bottom:60px}
+body.rm-on .page-jumpers{bottom:68px}
 </style>
 </head>
 <body>
@@ -572,13 +587,13 @@ body.rm-on .page-jumpers{bottom:88px}
     <p>تحويل ملاحظاتك إلى أسئلة اختيار من متعدد، وأسئلة سريرية، وإجابات قصيرة وطويلة، وصح/خطأ، وبطاقات مراجعة — بمستوى صعوبة تختاره.</p>
   </div>
 
-  <div id="rmChooser"><div class="card"><h2>اختر طريقة العمل</h2><p class="hint">تقدر تبدّل بينهم في أي وقت.</p>
+  <div id="rmChooser"><div class="card" style="text-align:center"><h2>اختر طريقة العمل</h2>
     <div class="mode-grid">
       <div class="mode-card" onclick="rmSetMode('simple')" role="button" tabindex="0"><b>الوضع المبسط</b><p>الإعدادات المعتادة: الصعوبة والأعداد واللغة. سريع ومباشر.</p></div>
       <div class="mode-card" onclick="rmSetMode('detailed')" role="button" tabindex="0"><b>الوضع المفصّل</b><p>برومبت امتحاني موسّع: تركيز الأسئلة، عمق الشرح، قواعد الصياغة، شارات المواضع، وسجل لأعمالك.</p></div>
     </div></div></div>
   <div id="rmBody" style="display:none">
-  <div class="row" style="margin-bottom:12px"><span class="status" id="rmModeLbl"></span><button class="btn-secondary" onclick="rmChoose()">تغيير الوضع</button></div>
+  <div class="mode-bar"><span class="mode-name" id="rmModeLbl"></span><button class="btn-secondary" onclick="rmChoose()">تغيير الوضع</button></div>
   <div id="rmP_home">
   <div class="card">
     <h2>مفتاح Gemini API</h2>
@@ -633,7 +648,7 @@ body.rm-on .page-jumpers{bottom:88px}
         <button type="button" class="chip" onclick="rmPreset('board')">اختيارات وحالات سريرية</button>
         <button type="button" class="chip" onclick="rmPreset('cards')">بطاقات وصح/خطأ</button>
         <button type="button" class="chip" onclick="rmPreset('written')">مقالي وشفوي</button></div>
-      <details class="rule-grp"><summary>قواعد صياغة الأسئلة (<span id="ruleCount"></span>)</summary><div id="rulesBox"></div>
+      <details class="rule-grp rule-main"><summary>قواعد صياغة الأسئلة (<span id="ruleCount"></span>)</summary><div id="rulesBox"></div>
         <div class="row" style="padding:10px 14px"><input type="text" id="ruleNew" placeholder="أضف قاعدة خاصة بك..." style="flex:1"><button type="button" class="btn-secondary" onclick="ruleAdd()">إضافة</button></div></details>
     </div>
     <hr class="settings-divider">
@@ -787,7 +802,7 @@ body.rm-on .page-jumpers{bottom:88px}
 </div>
 
 
-<nav class="rm-bar" id="rmBar"><button type="button" id="rmT_home" class="on" onclick="rmTab('home')"><span>🏠</span>الرئيسية</button><button type="button" id="rmT_res" onclick="rmTab('res')"><span>📋</span>النتائج</button><button type="button" id="rmT_lib" onclick="rmTab('lib')"><span>📚</span>المكتبة</button></nav>
+<nav class="rm-bar" id="rmBar"><button type="button" id="rmT_home" class="on" onclick="rmTab('home')">الرئيسية</button><button type="button" id="rmT_res" onclick="rmTab('res')">النتائج</button><button type="button" id="rmT_lib" onclick="rmTab('lib')">المكتبة</button></nav>
 <script>
 /* ============================================================
    MedicoMan — منطق الموقع. الأقسام: 1 ثوابت · 2 حالة · 3 تنقل · 4 أدوات مساعدة
@@ -795,7 +810,7 @@ body.rm-on .page-jumpers{bottom:88px}
    ============================================================ */
 
 /* ===== 1) الثوابت ===== */
-const VERSION = 'V3';
+const VERSION = 'V5';
 // تسجيل الأدوات: أداة جديدة = عنصر هنا + <div class="wrap view-hidden" id="tool-ID"> في الصفحة
 const TOOLS = [
   {id:'recallman', icon:'🧠', name:'RecallMan', desc:'حوّل محاضراتك إلى أسئلة متنوعة وبطاقات مراجعة بمستوى صعوبة تختاره.'},
@@ -958,7 +973,7 @@ const SCHEMA_D = {type:'object', required:KEYS, properties:{
   true_false: arr({statement:str, is_true:{type:'boolean'}, explanation:str, ...XK}),
   flashcards: arr({front:str, back:str, ...X})}};
 function fixOpts(p){ KEYS.forEach(k => (p[k] || []).forEach(q => { if(Array.isArray(q.options)) q.options = q.options.map(o => String(o).replace(/^\s*(?:[A-Da-d]|[1-4]|[أبجد])[\.\)\-:]\s+/, '')); })); return p; }
-function rmChoose(){ $('rmChooser').style.display = 'block'; $('rmBody').style.display = 'none'; rmBar(false); }
+function rmChoose(){ $('rmChooser').style.display = 'block'; $('rmBody').style.display = 'none'; rmBar(false); rmTab('home', true); }
 function rmSetMode(m){
   rmMode = m;
   $('tool-recallman').classList.toggle('detailed', m === 'detailed');
@@ -1010,7 +1025,11 @@ document.addEventListener('change', e => { if(e.target && e.target.id === 'fileI
 
 /* ===== التنقل السفلي + وضع الامتحان + العلامات + البطاقات ===== */
 const RM_PANES = ['home','res','lib'];
-function rmTab(t){ RM_PANES.forEach(p => { $('rmP_' + p).style.display = p === t ? 'block' : 'none'; $('rmT_' + p).classList.toggle('on', p === t); }); window.scrollTo({top:0, behavior:'smooth'}); }
+let rmCur = 'home';
+function rmTab(t, fromPop){
+  if(!fromPop && t !== rmCur){ try{ history.pushState({idx:navStack.length-1, view:'recallman', rm:t}, ''); }catch(e){} }
+  rmCur = t; RM_PANES.forEach(p => { $('rmP_' + p).style.display = p === t ? 'block' : 'none'; $('rmT_' + p).classList.toggle('on', p === t); }); window.scrollTo({top:0, behavior:'smooth'});
+}
 function rmBar(on){ $('rmBar').style.display = on ? 'flex' : 'none'; document.body.classList.toggle('rm-on', on); }
 function rmGo(m){ showTool('recallman'); rmSetMode(m); }
 let examMode = false, examDone = false, examSec = 0, examTimer = null, flagSet = {}, deckOn = false, deckIdx = 0;
@@ -1089,8 +1108,8 @@ function toggleToolsMenu(e){
 }
 // id = null يعني الصفحة الرئيسية. الحالة (نص/ملف/نتائج) تبقى لأن الواجهات لا تُمسح، فقط تُخفى.
 // ===== التنقل: زر الرجوع (أندرويد/المتصفح) يرجع خطوة لورا بدل ما يخرج من الموقع كله =====
-let navStack = [null];
-try{ history.replaceState({idx:0, view:null}, ''); }catch(e){}
+let navStack = [null], exitArmed = false, exitT = null;
+try{ history.replaceState({guard:1}, ''); history.pushState({idx:0, view:null}, ''); }catch(e){}
 function showView(id){
   id = id || null;
   if(id === currentTool){ renderView(id); return; }
@@ -1101,6 +1120,14 @@ function showView(id){
   renderView(id);
 }
 window.addEventListener('popstate', e => {
+  if(e.state && e.state.guard){
+    // وصلنا لأسفل الرئيسية: أول ضغطة تنبيه، تاني ضغطة (خلال ثانيتين) تخرج
+    if(exitArmed){ appExit(); return; }
+    exitArmed = true; clearTimeout(exitT); exitT = setTimeout(() => exitArmed = false, 2000);
+    showToast('اضغط مرة أخرى للخروج');
+    try{ history.pushState({idx:0, view:null}, ''); }catch(err){}
+    return;
+  }
   const menu = $('toolsMenu');
   if(menu && menu.classList.contains('open')){
     // القائمة مفتوحة: الرجوع يقفلها بس ويفضل في نفس الصفحة
@@ -1109,11 +1136,25 @@ window.addEventListener('popstate', e => {
     return;
   }
   const st = e.state || {idx:0, view:null};
+  if(currentTool === 'recallman' && st.view === 'recallman'){ rmTab(st.rm || 'home', true); return; }
   while(navStack.length <= st.idx) navStack.push(null);
   navStack = navStack.slice(0, st.idx+1);
   navStack[st.idx] = st.view;
   renderView(st.view);
 });
+
+/* ===== زر الرجوع في تطبيق الأندرويد ===== */
+(function(){
+  const back = () => history.back();
+  try{ const A = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App; if(A && A.addListener) A.addListener('backButton', back); }catch(e){}
+  document.addEventListener('backbutton', back, false);   // Cordova
+})();
+function appExit(){
+  try{ const A = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App; if(A && A.exitApp) return A.exitApp(); }catch(e){}
+  try{ if(navigator.app && navigator.app.exitApp) return navigator.app.exitApp(); }catch(e){}
+  try{ window.close(); }catch(e){}
+  history.back();
+}
 function renderView(id){
   currentTool = id;
   if(id === 'recallman') rmChoose(); else rmBar(false);
@@ -1130,7 +1171,7 @@ function renderTools(){
   $('toolsMenu').insertAdjacentHTML('beforeend', TOOLS.map(t => `<button type="button" class="tools-menu-item" data-tool="${t.id}" role="menuitem" onclick="showTool('${t.id}')"><span class="menu-icon">${t.icon}</span><span>${t.name}</span></button>`).join(''));
   document.querySelectorAll('[data-version]').forEach(e => e.textContent = VERSION);
   sessRender(); rulesRender();
-  $('toolsMenu').querySelector('[data-tool="recallman"]').insertAdjacentHTML('afterend', ['simple','detailed'].map(m => `<button type="button" class="tools-menu-item" data-mode="${m}" role="menuitem" onclick="rmGo('${m}')"><span class="menu-icon">↳</span><span>${m === 'simple' ? 'الوضع المبسط' : 'الوضع المفصّل'}</span></button>`).join(''));
+  $('toolsMenu').querySelector('[data-tool="recallman"]').insertAdjacentHTML('afterend', '<div class="tools-menu-subs">' + ['simple','detailed'].map(m => `<button type="button" class="tools-menu-item" data-mode="${m}" role="menuitem" onclick="rmGo('${m}')"><span>${m === 'simple' ? 'الوضع المبسط' : 'الوضع المفصّل'}</span></button>`).join('') + '</div>');
 }
 document.addEventListener('click', e => { const w = document.querySelector('.topbar-menu-wrap'); if(w && !w.contains(e.target)) closeToolsMenu(); });
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeToolsMenu(); });
