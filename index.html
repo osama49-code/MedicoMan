@@ -476,6 +476,43 @@ body.dark-mode .bg-ambient span:nth-child(4){background:rgba(163,230,53,.08);}
 .pm-bar{position:fixed; z-index:60;}
 .tools-menu{z-index:220;}
 
+
+/* ===== الوضع المفصّل + السجل ===== */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0 4px}
+@media(max-width:560px){.mode-grid{grid-template-columns:1fr}}
+.mode-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+.mode-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.mode-card b{display:block;font-size:17px;margin-bottom:6px;color:var(--ink)}
+.mode-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+.dtl{display:none}
+#tool-recallman.detailed .dtl{display:block}
+.rule-grp{border:1px solid var(--line);border-radius:var(--radius-sm);margin:10px 0;background:var(--input-bg)}
+.rule-grp summary{padding:10px 14px;cursor:pointer;font-weight:700;color:var(--ink)}
+.rule-row{display:flex;gap:10px;align-items:flex-start;padding:9px 14px;border-top:1px solid var(--line);font-size:14px;color:var(--ink)}
+.rule-row input[type=checkbox]{width:auto;margin-top:5px;accent-color:var(--accent-dark)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.chip{padding:7px 14px;border:1px solid var(--line-strong);border-radius:var(--radius-pill);background:var(--card);color:var(--ink);cursor:pointer;font:inherit;font-size:13px}
+.chip.on{background:var(--grad-accent);border-color:transparent;color:#0B1C2C;font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.badge{background:var(--expl-bg);color:var(--expl-label);border:1px solid var(--expl-border);border-radius:var(--radius-pill);padding:2px 10px;font-size:12px;font-weight:700}
+.tag{color:var(--muted);font-size:12px}
+#resultsWrap.trapsonly [data-y="n"]{display:none!important}
+
+.chips.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chips.g2 .chip{width:100%;text-align:center;padding:10px 8px}
+.rule-body{flex:1;min-width:0}
+.rule-pen{border:none;background:transparent;cursor:pointer;font-size:15px;padding:2px 6px}
+.rule-row textarea{margin-top:6px;width:100%}
+.flagbtn{margin-top:10px}
+#resultsWrap.flagsonly [data-f="0"]{display:none!important}
+#flashList.deck .flash{display:none}
+#flashList.deck .flash.cur{display:flex}
+.rm-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:60;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(11,28,44,.08);padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:6px}
+.rm-bar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border:none;border-radius:var(--radius-sm);background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.rm-bar button.on{background:var(--grad-accent);color:#0B1C2C}
+.rm-bar button span{font-size:18px}
+body.rm-on{padding-bottom:78px}
+body.rm-on .page-jumpers{bottom:88px}
 </style>
 </head>
 <body>
@@ -535,6 +572,14 @@ body.dark-mode .bg-ambient span:nth-child(4){background:rgba(163,230,53,.08);}
     <p>تحويل ملاحظاتك إلى أسئلة اختيار من متعدد، وأسئلة سريرية، وإجابات قصيرة وطويلة، وصح/خطأ، وبطاقات مراجعة — بمستوى صعوبة تختاره.</p>
   </div>
 
+  <div id="rmChooser"><div class="card"><h2>اختر طريقة العمل</h2><p class="hint">تقدر تبدّل بينهم في أي وقت.</p>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="rmSetMode('simple')" role="button" tabindex="0"><b>الوضع المبسط</b><p>الإعدادات المعتادة: الصعوبة والأعداد واللغة. سريع ومباشر.</p></div>
+      <div class="mode-card" onclick="rmSetMode('detailed')" role="button" tabindex="0"><b>الوضع المفصّل</b><p>برومبت امتحاني موسّع: تركيز الأسئلة، عمق الشرح، قواعد الصياغة، شارات المواضع، وسجل لأعمالك.</p></div>
+    </div></div></div>
+  <div id="rmBody" style="display:none">
+  <div class="row" style="margin-bottom:12px"><span class="status" id="rmModeLbl"></span><button class="btn-secondary" onclick="rmChoose()">تغيير الوضع</button></div>
+  <div id="rmP_home">
   <div class="card">
     <h2>مفتاح Gemini API</h2>
     <p class="hint">يُحفظ المفتاح في متصفحك فقط (localStorage) ويُرسل مباشرة إلى Google.</p>
@@ -572,6 +617,24 @@ body.dark-mode .bg-ambient span:nth-child(4){background:rgba(163,230,53,.08);}
         <option value="advanced">صعب</option>
         <option value="clinical">أسئلة سريرية</option>
       </select>
+    </div>
+    <div class="dtl">
+      <div class="difficulty-wrap"><label>تركيز الأسئلة</label><select id="rmFocus">
+        <option value="comprehensive">شامل: أهم المواضع + التفاصيل الدقيقة</option>
+        <option value="core">الأكثر تكرارًا في الامتحانات</option>
+        <option value="traps">صيد الفخاخ والتفاصيل الدقيقة</option>
+        <option value="differential">التفريق بين المتشابهات والتدبير</option></select></div>
+      <div class="difficulty-wrap"><label>عمق الشرح</label><select id="rmDepth">
+        <option value="full">شرح كامل (4 أجزاء)</option><option value="short">شرح مختصر للمراجعة السريعة</option></select></div>
+      <div class="difficulty-wrap"><label>ملاحظة خاصة بهذه الدفعة</label><input type="text" id="rmNote" placeholder="مثال: ركّز على الجرعات وأسئلة الدكتور"></div>
+      <label>توزيع جاهز للأعداد</label>
+      <div class="chips g2">
+        <button type="button" class="chip" onclick="rmPreset('mix')">متوازن</button>
+        <button type="button" class="chip" onclick="rmPreset('board')">اختيارات وحالات سريرية</button>
+        <button type="button" class="chip" onclick="rmPreset('cards')">بطاقات وصح/خطأ</button>
+        <button type="button" class="chip" onclick="rmPreset('written')">مقالي وشفوي</button></div>
+      <details class="rule-grp"><summary>قواعد صياغة الأسئلة (<span id="ruleCount"></span>)</summary><div id="rulesBox"></div>
+        <div class="row" style="padding:10px 14px"><input type="text" id="ruleNew" placeholder="أضف قاعدة خاصة بك..." style="flex:1"><button type="button" class="btn-secondary" onclick="ruleAdd()">إضافة</button></div></details>
     </div>
     <hr class="settings-divider">
     <div class="counts-grid">
@@ -629,7 +692,13 @@ body.dark-mode .bg-ambient span:nth-child(4){background:rgba(163,230,53,.08);}
     </div>
   </div>
 
+  </div>
+<div id="rmP_lib" style="display:none">
+  <div class="card"><h2>مكتبة أعمالي</h2><p class="hint">كل توليد يُحفظ تلقائيًا بالمادة والملف والأسئلة. اضغط «فتح» للرجوع له.</p><div id="sessList"></div></div></div>
+<div id="rmP_res" style="display:none"><div class="empty" id="resEmpty">لا توجد نتائج بعد. ولّد أسئلة من الصفحة الرئيسية أو افتح عملًا من المكتبة.</div>
   <div id="resultsWrap" style="display:none;">
+    <div class="chips dtl" id="examBar"><button type="button" class="chip on" id="exM0" onclick="rmExam(false)">وضع المذاكرة</button><button type="button" class="chip" id="exM1" onclick="rmExam(true)">وضع الامتحان</button><span class="tag" id="examTimer"></span><button type="button" class="chip" id="examEnd" style="display:none" onclick="examFinish()">إنهاء وتصحيح</button><span class="tag" id="examScore"></span></div>
+    <div class="chips dtl"><button type="button" class="chip on" id="yf0" onclick="yieldFilter(0)">كل الأسئلة</button><button type="button" class="chip" id="yf1" onclick="yieldFilter(1)">الفخاخ والتفاصيل الدقيقة فقط</button><button type="button" class="chip" id="yf2" onclick="yieldFilter(2)">المعلّمة للمراجعة</button></div>
     <div class="tabs" id="tabsBar"></div>
     <div class="random-mode-bar">
       <button class="random-mode-btn" id="randomModeBtn" onclick="startRandomQuiz()">اختبار عشوائي</button>
@@ -643,6 +712,8 @@ body.dark-mode .bg-ambient span:nth-child(4){background:rgba(163,230,53,.08);}
     <div id="flashList" style="display:none;"></div>
   </div>
 
+  </div>
+  </div>
   <div class="page-jumpers" aria-label="التنقل السريع">
     <button class="page-jump" type="button" title="إلى أول الموقع" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
     <button class="page-jump" type="button" title="إلى آخر الموقع" onclick="window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'})">↓</button>
@@ -716,6 +787,7 @@ body.dark-mode .bg-ambient span:nth-child(4){background:rgba(163,230,53,.08);}
 </div>
 
 
+<nav class="rm-bar" id="rmBar"><button type="button" id="rmT_home" class="on" onclick="rmTab('home')"><span>🏠</span>الرئيسية</button><button type="button" id="rmT_res" onclick="rmTab('res')"><span>📋</span>النتائج</button><button type="button" id="rmT_lib" onclick="rmTab('lib')"><span>📚</span>المكتبة</button></nav>
 <script>
 /* ============================================================
    MedicoMan — منطق الموقع. الأقسام: 1 ثوابت · 2 حالة · 3 تنقل · 4 أدوات مساعدة
@@ -723,7 +795,7 @@ body.dark-mode .bg-ambient span:nth-child(4){background:rgba(163,230,53,.08);}
    ============================================================ */
 
 /* ===== 1) الثوابت ===== */
-const VERSION = 'V1';
+const VERSION = 'V3';
 // تسجيل الأدوات: أداة جديدة = عنصر هنا + <div class="wrap view-hidden" id="tool-ID"> في الصفحة
 const TOOLS = [
   {id:'recallman', icon:'🧠', name:'RecallMan', desc:'حوّل محاضراتك إلى أسئلة متنوعة وبطاقات مراجعة بمستوى صعوبة تختاره.'},
@@ -794,6 +866,206 @@ const MANUAL_READABLE_INSTRUCTIONS = `تعليمات صارمة للرد:
 - للعناوين الفرعية داخل الإجابات الطويلة: سطر فارغ قبل كل عنوان، وعناوين بخط عريض.
 - الهدف أن يقرأ المستخدم ويتذاكر من الرد مباشرة.`;
 
+
+/* ===== الوضع المفصّل: البرومبت الامتحاني الموسّع ===== */
+let rmMode = 'simple', curFileName = null;
+const YIELD_AR = {high_yield:'متكرر في الامتحانات', exam_trap:'فخ امتحاني', subtle_nuance:'تفصيلة دقيقة', differential_pivot:'نقطة تفريق', core_concept:'مفهوم أساسي'};
+const isTrap = q => ['exam_trap','subtle_nuance','differential_pivot'].includes(q.exam_yield);
+const metaHtml = q => (q.exam_yield || q.topic_tag) ? `<div class="meta">${q.exam_yield ? `<span class="badge">${YIELD_AR[q.exam_yield] || q.exam_yield}</span>` : ''}${q.topic_tag ? `<span class="tag">${q.topic_tag}</span>` : ''}</div>` : '';
+const expl2 = q => (q.explanation || '') + (q.key_clue ? '\n\n**القرينة الحاسمة:** ' + q.key_clue : '');
+const LANG_D = {
+  en: 'Write EVERY field strictly in professional academic/medical English (stems, scenarios, options, explanations, answers, cards). No Arabic characters at all.',
+  ar: 'اكتب كل الحقول بالعربية العلمية الواضحة، والمصطلح الأجنبي الدقيق بين قوسين عند الضرورة فقط.',
+  mixed: 'اكتب الجمل والشرح وسرد الحالة بالعربية، وأبقِ المصطلحات الطبية وأسماء الأمراض والأدوية والاختصارات بالإنجليزية.'};
+const DIFF_D = {
+  adaptive: 'توزيع مدروس: 20% تأسيسي ذكي، 35% فهم وتطبيق، 30% استنتاج بخطوتين، 15% فخاخ وتمييز دقيق. يُمنع تقديم كل الأسئلة بنفس الوتيرة.',
+  basic: 'تأسيسي مركّز: حقائق وتعريفات وتصنيفات وخطوط أولى، لكن بخيارات متجانسة غير مكشوفة.',
+  intermediate: 'تطبيقي: لماذا وكيف؛ حوّل المعلومة إلى موقف أو علاقة سببية، ولا تسأل تعريفًا مباشرًا.',
+  advanced: 'تحليلي متعدد الخطوات: اربط بين فقرات متباعدة، واسأل عن الآلية أو المضاعفة أو الاستثناء أو الخطوة التالية، واستهدف الفروق الدقيقة والحالات الحدية.',
+  clinical: 'بورد سريري: صغ الجذر كحالة واقعية متى أمكن، وركّز على أفضل خطوة تالية، والتشخيص الأرجح، والفحص الأولي مقابل التأكيدي، والآلية، وموانع الاستعمال.'};
+const FOCUS_D = {
+  comprehensive: '70% من البؤر الامتحانية الكلاسيكية (مقارنات، خط أول، فحص أولي مقابل مؤكد، الأشيع مقابل الأخطر، علامات واسمة، أرقام فاصلة، موانع) و30% من التفاصيل الدقيقة والاستثناءات والهوامش.',
+  core: '85% للبؤر الأعلى ورودًا التي لا يخلو منها امتحان، و15% لأهم استثناءاتها.',
+  traps: '55% فخاخ واستثناءات وهوامش وتشابه لفظي مضلل، و45% نقاط تمييز؛ أسئلة تبدو مألوفة وفيها تفصيلة تقلب الإجابة.',
+  differential: 'ابنِ الأسئلة على التفريق بين المتشابهات وترتيب الخطوات (ماذا تفعل أولًا؟ ما العلامة التي ترجّح أ على ب؟)، وبدائل تمثل قرارات صحيحة في حالات مجاورة.'};
+const EXPL_D = {
+  full: 'الشرح إلزامي من 4 أجزاء بعناوين عريضة: **1. مفتاح الحل والقرينة** ثم **2. الآلية العلمية** ثم **3. تشريح البدائل الخاطئة ومتى تصح** ثم **4. فخ الامتحان**. يُمنع الشرح من سطر أو سطرين.',
+  short: 'شرح مركز من 3 نقاط: سبب صحة الإجابة مع القرينة، سبب استبعاد أقرب بديلين، وخلاصة امتحانية في جملة.'};
+const RULE_GRPS = ['استهداف مواضع الامتحان','صياغة جذر السؤال','صناعة الخيارات','أنواع الأسئلة الخاصة','الشرح'];
+const RULES = [
+  [0,'مسح المحاضرة كاملة','امسح النص كله قبل الصياغة وحدد المواضع الحتمية (خط أول، آلية، مقارنة، علامة خطورة) والدقيقة (استثناءات، أرقام حدية، ملاحظات جانبية).'],
+  [0,'حذف الحشو','تجاهل المقدمات والمعلومات البديهية؛ كل سؤال يختبر معلومة لها وزن في ورقة امتحان حقيقية.'],
+  [0,'صيد الاستثناءات','حوّل جمل (باستثناء، على عكس، يفضّل في...) إلى أسئلة تمييزية.'],
+  [0,'توزيع التغطية','وزّع الأسئلة على بداية النص ووسطه ونهايته ولا تكرر الفكرة بصياغتين.'],
+  [0,'الالتزام بالمادة','ابنِ الحقائق على المادة فقط ولا تناقض أرقامها أو تصنيفاتها؛ يُسمح بسيناريوهات تطبيقية لمفاهيمها.'],
+  [1,'جذر مكتمل','اجعل الجذر محددًا ومكتمل المعطيات بحيث يُجاب عنه قبل رؤية الخيارات، وامنع صيغة "أي مما يلي صحيح؟".'],
+  [1,'صياغة إيجابية','تجنب "ما عدا / EXCEPT" إلا لموانع الاستعمال الحرجة.'],
+  [1,'من الحفظ إلى الاستدلال','اسأل عن الآلية أو القرار انطلاقًا من نتيجة أو موقف، لا عن تعريف مباشر، مع قرينة حاسمة.'],
+  [1,'منع إيحاءات الشكل','لا تجعل الصحيح الأطول أو المشارك للجذر لفظيًا؛ الخيارات متقاربة في الطول والبنية.'],
+  [2,'تجانس الخيارات','الخيارات الأربعة من فئة علمية واحدة؛ ممنوع "جميع ما سبق" و"لا شيء مما سبق" و"أ و ب".'],
+  [2,'مشتتات واقعية','كل خيار خاطئ يمثل خطأ حقيقيًا: مرض مشابه ينقصه عنصر، فحص أولي بدل تأكيدي، عكس اتجاه التغير، علاج مرحلة أخرى.'],
+  [2,'توازن مفاتيح الإجابة','وزّع correct_index بالتساوي على 0 و1 و2 و3 ولا تكرر الموضع أكثر من مرتين متتاليتين.'],
+  [3,'بنية السيناريو السريري','العمر والجنس ← الشكوى ومدتها ← التاريخ والأدوية ← العلامات الإيجابية والسلبية المهمة ← العلامات الحيوية والفحص ← التحاليل والأشعة، ثم سؤال محدد.'],
+  [3,'دقة صح/خطأ','عبارات حاسمة بلا مطاطية، ونسبة الصح والخطأ متقاربة، والخاطئة تعكس شرطًا دقيقًا لا خطأً ساذجًا.'],
+  [3,'المقالي المنظم','عناوين مرقمة بخط عريض **1. العنوان** في سطر مستقل، ثم نقاط • كل نقطة في سطر، وسطر فارغ بين المحاور.'],
+  [3,'بطاقات الاسترجاع','الوجه الأمامي سؤال حاد محدد، والخلفي إجابة مركزة مع لمحة امتحانية.'],
+  [4,'القرينة الحاسمة','حدد key_clue: الكلمة أو المعطى الذي يميز الصحيح عن أقرب منافس، ووضحه في الشرح.'],
+  [4,'لماذا استُبعد الخيار؟','اشرح سبب خطأ كل بديل هنا، ومتى يصبح صحيحًا في سؤال آخر.']
+].map((r, i) => ({id:'r' + i, g:r[0], t:r[1], d:r[2]}));
+const RULE_KEY = 'rm_rules_v1';
+let ruleSt = {off:[], custom:[]};
+try{ ruleSt = Object.assign(ruleSt, JSON.parse(localStorage.getItem(RULE_KEY) || '{}')); }catch(e){}
+const ruleSave = () => { try{ localStorage.setItem(RULE_KEY, JSON.stringify(ruleSt)); }catch(e){} };
+ruleSt.edits = ruleSt.edits || {}; let ruleEditing = null;
+const ruleText = r => ruleSt.edits[r.id] || r.d;
+const activeRules = () => [...RULES.filter(r => !ruleSt.off.includes(r.id)).map(ruleText), ...ruleSt.custom.filter(c => !c.off).map(c => c.d)];
+const ruleCount = () => { $('ruleCount').textContent = activeRules().length + ' مفعّلة'; };
+function ruleToggle(id, custom){
+  if(custom) ruleSt.custom[id].off = !ruleSt.custom[id].off;
+  else { const k = ruleSt.off.indexOf(id); k < 0 ? ruleSt.off.push(id) : ruleSt.off.splice(k, 1); }
+  ruleSave(); ruleCount();   // بدون إعادة رسم: القوائم تفضل مفتوحة
+}
+function ruleAdd(){ const v = $('ruleNew').value.trim(); if(!v) return; ruleSt.custom.push({d:v, off:false}); $('ruleNew').value = ''; ruleSave(); rulesRender(); const ds = $('rulesBox').querySelectorAll('details'); ds[ds.length - 1].open = true; }
+function ruleDel(i){ ruleSt.custom.splice(i, 1); ruleSave(); rulesRender(); }
+function ruleEdit(k){ ruleEditing = k; rulesRender(); }
+function ruleEditSave(k){
+  const v = $('ruleEd').value.trim();
+  if(v){ if(k[0] === 'c') ruleSt.custom[+k.slice(1)].d = v; else { const r = RULES.find(x => x.id === k); v === r.d ? delete ruleSt.edits[k] : ruleSt.edits[k] = v; } }
+  ruleEditing = null; ruleSave(); rulesRender();
+}
+function ruleEditReset(k){ delete ruleSt.edits[k]; ruleEditing = null; ruleSave(); rulesRender(); }
+function rulesRender(){
+  const b = $('rulesBox'); if(!b) return;
+  const open = [...b.querySelectorAll('details')].map(d => d.open);
+  const btn = (c, fn, t) => `<button type="button" class="chip ${c}" onclick="${fn}">${t}</button>`;
+  const row = (k, t, d, on, fn, edited) => `<div class="rule-row"><input type="checkbox" ${on ? 'checked' : ''} onchange="${fn}"><div class="rule-body"><b>${t}${edited ? ' <span class="tag">(معدّلة)</span>' : ''}</b>${ruleEditing === k ? `<textarea id="ruleEd" rows="4">${libEsc(d)}</textarea><div class="chips" style="margin:6px 0 0">${btn('on', `ruleEditSave('${k}')`, 'حفظ')}${btn('', 'ruleEdit(null)', 'إلغاء')}${k[0] !== 'c' && ruleSt.edits[k] ? btn('', `ruleEditReset('${k}')`, 'استعادة الأصلي') : ''}</div>` : `<br><span class="hint">${libEsc(d)}</span>`}</div><button type="button" class="rule-pen" onclick="ruleEdit('${k}')" title="تعديل">✏️</button>${k[0] === 'c' ? `<button type="button" class="lib-del" onclick="ruleDel(${k.slice(1)})" title="حذف">🗑</button>` : ''}</div>`;
+  b.innerHTML = RULE_GRPS.map((g, gi) => `<details class="rule-grp" style="margin:0;border:0"><summary>${g}</summary>${RULES.filter(r => r.g === gi).map(r => row(r.id, r.t, ruleText(r), !ruleSt.off.includes(r.id), `ruleToggle('${r.id}')`, !!ruleSt.edits[r.id])).join('')}</details>`).join('')
+    + (ruleSt.custom.length ? `<details class="rule-grp" style="margin:0;border:0"><summary>قواعدي الخاصة</summary>${ruleSt.custom.map((c, i) => row('c' + i, 'قاعدة خاصة ' + (i + 1), c.d, !c.off, `ruleToggle(${i},1)`, false)).join('')}</details>` : '');
+  b.querySelectorAll('details').forEach((d, i) => { if(open[i] !== undefined) d.open = open[i]; });
+  ruleCount();
+}
+function masterPrompt(inp, reqs, clin, mat){
+  const rules = activeRules().map((d, i) => `${i + 1}. ${d}`).join('\n');
+  return `أنت كبير واضعي الأسئلة الامتحانية وخبير القياس والتقويم الأكاديمي والطبي. مهمتك بناء بنك أسئلة بمعايير لجان الامتحانات والبورد، يغطي المواضع المتكررة والتفاصيل الدقيقة الفارقة.\n\nالمطلوب بالضبط:\n${reqs.join('\n')}${clin}\n\n## اللغة\n${LANG_D[genLang] || LANG_D.en}\n\n## الصعوبة\n${DIFF_D[inp.difficulty] || DIFF_D.adaptive}\n\n## التركيز\n${FOCUS_D[inp.focus] || FOCUS_D.comprehensive}\n\n## القواعد الإلزامية\n${rules}\n\n## الشرح\n${EXPL_D[inp.depth] || EXPL_D.full}\n\nتصنيف exam_yield: high_yield = موضع متكرر، exam_trap = فخ شائع، subtle_nuance = تفصيلة دقيقة، differential_pivot = نقطة تفريق، core_concept = قاعدة أساسية.\n\nلا تضع A. أو B. داخل نص الاختيارات.${inp.note ? '\n\nتوجيه خاص لهذه الدفعة: ' + inp.note : ''}\n\nأي نوع عدده صفر أعده مصفوفة فارغة [] إن كان الرد JSON.${mat}`;
+}
+const JSON_D = MANUAL_JSON_INSTRUCTIONS + '\nأضف لكل عنصر في كل الأنواع الحقلين exam_yield (high_yield | exam_trap | subtle_nuance | differential_pivot | core_concept) و topic_tag، ولأسئلة MCQ والسريرية وصح/خطأ حقل key_clue أيضًا.';
+const READ_D = MANUAL_READABLE_INSTRUCTIONS + '\n- ابدأ بخريطة أهم 5 فخاخ ومواضع امتحانية في المادة.\n- اعرض الأسئلة بدون إجاباتها، ثم ضع «نموذج الإجابات والتشريح» في آخر كل قسم.';
+const X = {exam_yield:str, topic_tag:str}, XK = {...X, key_clue:str};
+const SCHEMA_D = {type:'object', required:KEYS, properties:{
+  mcqs: arr({question:str, options:strList, correct_index:{type:'integer'}, explanation:str, ...XK}),
+  clinical: arr({scenario:str, question:str, options:strList, correct_index:{type:'integer'}, explanation:str, ...XK}),
+  short_answer: arr({...QA, ...X}), long_answer: arr({...QA, ...X}),
+  true_false: arr({statement:str, is_true:{type:'boolean'}, explanation:str, ...XK}),
+  flashcards: arr({front:str, back:str, ...X})}};
+function fixOpts(p){ KEYS.forEach(k => (p[k] || []).forEach(q => { if(Array.isArray(q.options)) q.options = q.options.map(o => String(o).replace(/^\s*(?:[A-Da-d]|[1-4]|[أبجد])[\.\)\-:]\s+/, '')); })); return p; }
+function rmChoose(){ $('rmChooser').style.display = 'block'; $('rmBody').style.display = 'none'; rmBar(false); }
+function rmSetMode(m){
+  rmMode = m;
+  $('tool-recallman').classList.toggle('detailed', m === 'detailed');
+  $('rmChooser').style.display = 'none'; $('rmBody').style.display = 'block';
+  $('rmModeLbl').textContent = m === 'detailed' ? 'الوضع المفصّل' : 'الوضع المبسط';
+  document.querySelectorAll('[data-mode]').forEach(e => e.classList.toggle('active-tool', e.dataset.mode === m));
+  rmBar(true); if(!$('rmBar').querySelector('.on')) rmTab('home');
+  if(m !== 'detailed'){ yieldFilter(0); rmExam(false); deckMode(0); }
+}
+function rmPreset(p){
+  const P = {mix:[8,6,4,6,3,1], board:[14,10,2,2,0,0], cards:[2,2,10,14,0,0], written:[2,0,2,4,8,4]};
+  ['numQ','numClinical','numTF','numF','numSA','numLA'].forEach((id, i) => $(id).value = P[p][i]);
+}
+function yieldFilter(k){ const w = $('resultsWrap'); w.classList.toggle('trapsonly', k === 1); w.classList.toggle('flagsonly', k === 2); [0,1,2].forEach(i => $('yf' + i).classList.toggle('on', i === k)); }
+
+/* ===== سجل الأعمال (IndexedDB) ===== */
+const SESS = 'sessions';
+const sessAll = () => libTx('readonly', s => s.getAll(), SESS).then(v => v || []);
+async function sessSave(data){
+  const text = $('sourceText').value.trim();
+  const n = KEYS.reduce((a, k) => a + (data[k] || []).length, 0);
+  const rec = {title: curFileName || text.slice(0, 45) || 'عمل بدون عنوان', at: Date.now(), mode: rmMode, lang: genLang, diff: $('difficulty').value, text, file: uploadedImage ? {...uploadedImage, name: curFileName} : null, n, data};
+  try{ await libTx('readwrite', s => s.add(rec), SESS); sessRender(); }
+  catch(e){ showToast('تعذّر حفظ العمل في السجل.'); }
+}
+async function sessRender(){
+  const box = $('sessList'); if(!box) return;
+  let items = []; try{ items = await sessAll(); }catch(e){ box.innerHTML = '<div class="lib-empty">تعذّر فتح السجل.</div>'; return; }
+  items.sort((a, b) => b.at - a.at);
+  box.innerHTML = items.length ? items.map(s => `<div class="lib-item"><span class="lib-name" title="${libEsc(s.title)}">${s.file ? '📎' : '📝'} ${libEsc(s.title)}</span><span class="lib-meta">${s.n} عنصر · ${new Date(s.at).toLocaleDateString('ar-EG')}</span><button type="button" class="btn-secondary" onclick="sessOpen(${s.id})">فتح</button><button type="button" class="lib-del" onclick="sessDel(${s.id})" title="حذف">🗑</button></div>`).join('') : '<div class="lib-empty">لا توجد أعمال محفوظة بعد.</div>';
+}
+async function sessOpen(id){
+  const s = await libTx('readonly', st => st.get(id), SESS); if(!s) return;
+  $('sourceText').value = s.text || '';
+  uploadedImage = s.file ? {mimeType: s.file.mimeType, base64: s.file.base64} : null;
+  curFileName = s.file ? s.file.name : null;
+  $('fileStatus').textContent = s.file ? '📎 ' + (s.file.name || 'ملف محفوظ') : '';
+  genLang = s.lang || 'en'; $('difficulty').value = s.diff || 'adaptive';
+  rmSetMode(s.mode || 'simple');
+  displayParsedResults(s.data, true);
+  $('resultsWrap').scrollIntoView({behavior:'smooth'});
+  showToast('تم فتح العمل المحفوظ ✓', true);
+}
+async function sessDel(id){
+  if(!confirm('حذف هذا العمل من السجل؟')) return;
+  await libTx('readwrite', s => s.delete(id), SESS); sessRender();
+}
+document.addEventListener('change', e => { if(e.target && e.target.id === 'fileInput') curFileName = e.target.files[0] ? e.target.files[0].name : null; });
+
+/* ===== التنقل السفلي + وضع الامتحان + العلامات + البطاقات ===== */
+const RM_PANES = ['home','res','lib'];
+function rmTab(t){ RM_PANES.forEach(p => { $('rmP_' + p).style.display = p === t ? 'block' : 'none'; $('rmT_' + p).classList.toggle('on', p === t); }); window.scrollTo({top:0, behavior:'smooth'}); }
+function rmBar(on){ $('rmBar').style.display = on ? 'flex' : 'none'; document.body.classList.toggle('rm-on', on); }
+function rmGo(m){ showTool('recallman'); rmSetMode(m); }
+let examMode = false, examDone = false, examSec = 0, examTimer = null, flagSet = {}, deckOn = false, deckIdx = 0;
+const fmtT = s => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+function rmExam(on, noRender){
+  examMode = on; examDone = false; clearInterval(examTimer); examSec = 0;
+  $('exM0').classList.toggle('on', !on); $('exM1').classList.toggle('on', on);
+  $('examTimer').textContent = on ? '00:00' : ''; $('examScore').textContent = ''; $('examEnd').style.display = on ? '' : 'none';
+  if(on) examTimer = setInterval(() => { examSec++; $('examTimer').textContent = fmtT(examSec); }, 1000);
+  if(lastParsed && !noRender){ userAnswers = {mcq:{}, clinical:{}, tf:{}}; renderResults(lastParsed); }
+}
+function examFinish(){
+  if(!examMode || examDone || !lastParsed) return;
+  examDone = true; clearInterval(examTimer);
+  let ok = 0, tot = 0;
+  [['mcq','mcqs'], ['clinical','clinical'], ['tf','true_false']].forEach(([type, key]) => {
+    const list = lastParsed[key] || [], isTF = type === 'tf';
+    $(tabDef(type).listId).querySelectorAll('.mcq').forEach((box, qi) => {
+      const q = list[qi]; if(!q) return;
+      const ci = isTF ? (q.is_true ? 0 : 1) : q.correct_index, a = userAnswers[type][qi];
+      const ai = a == null ? null : (isTF ? (a ? 0 : 1) : a), opts = [...box.querySelectorAll('.opt')];
+      opts.forEach(o => o.classList.remove('selected'));
+      if(opts[ci]) opts[ci].classList.add('correct');
+      if(ai != null && ai !== ci && opts[ai]) opts[ai].classList.add('wrong');
+      showExpl(box, expl2(q)); tot++; if(ai === ci) ok++;
+    });
+  });
+  $('examScore').textContent = `النتيجة: ${ok} / ${tot} · الزمن ${fmtT(examSec)}`;
+  showToast('تم تصحيح الامتحان ✓', true);
+}
+function addFlag(box, key){
+  box.dataset.f = flagSet[key] ? '1' : '0';
+  const b = mk('button', 'chip dtl flagbtn' + (flagSet[key] ? ' on' : ''), '🚩 علّم للمراجعة'); b.type = 'button';
+  b.onclick = e => { e.stopPropagation(); flagSet[key] = !flagSet[key]; box.dataset.f = flagSet[key] ? '1' : '0'; b.classList.toggle('on', !!flagSet[key]); };
+  box.appendChild(b);
+}
+function deckApply(){
+  const w = $('flashList'); w.classList.toggle('deck', deckOn);
+  const cs = [...w.querySelectorAll('.flash')]; if(!cs.length) return;
+  deckIdx = Math.max(0, Math.min(deckIdx, cs.length - 1));
+  cs.forEach((c, i) => c.classList.toggle('cur', i === deckIdx));
+  w.querySelectorAll('.deck-nav,#deckCnt').forEach(e => e.style.display = deckOn ? '' : 'none');
+  $('deckCnt').textContent = (deckIdx + 1) + ' / ' + cs.length;
+  w.querySelectorAll('.deckbar .chip:not(.deck-nav)').forEach((c, i) => c.classList.toggle('on', (i === 1) === deckOn));
+}
+function deckMode(on){ deckOn = !!on; deckIdx = 0; if($('deckCnt')) deckApply(); else $('flashList').classList.remove('deck'); }
+function deckStep(d){ deckIdx += d; deckApply(); }
+document.addEventListener('keydown', e => {
+  if(currentTool !== 'recallman' || !deckOn || activeTab !== 'flash' || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName || '')) return;
+  const rtl = genLang === 'ar', cs = document.querySelectorAll('#flashList .flash');
+  if(e.key === 'ArrowLeft') deckStep(rtl ? 1 : -1);
+  else if(e.key === 'ArrowRight') deckStep(rtl ? -1 : 1);
+  else if((e.key === ' ' || e.key === 'Enter') && cs[deckIdx]){ e.preventDefault(); cs[deckIdx].click(); }
+});
+
 /* ===== 2) الحالة ===== */
 let uploadedImage = null, genLang = 'en', activeTab = 'mcq', lastParsed = null, toastTimer = null, currentTool = null;
 let resultsCache = {ar:null, en:null, mixed:null};
@@ -844,6 +1116,7 @@ window.addEventListener('popstate', e => {
 });
 function renderView(id){
   currentTool = id;
+  if(id === 'recallman') rmChoose(); else rmBar(false);
   closeToolsMenu();
   document.querySelectorAll('.wrap').forEach(v => v.classList.toggle('view-hidden', v.id !== (id ? 'tool-' + id : 'homeView')));
   document.querySelectorAll('.tools-menu-item').forEach(el => el.classList.toggle('active-tool', el.dataset.tool === id));
@@ -856,6 +1129,8 @@ function renderTools(){
   $('toolsGrid').innerHTML = TOOLS.map(t => `<div class="tool-card" onclick="showTool('${t.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showTool('${t.id}')}"><div class="tool-card-icon" aria-hidden="true">${t.icon}</div><div class="tool-card-body"><h3>${t.name}</h3><p>${t.desc}</p></div></div>`).join('');
   $('toolsMenu').insertAdjacentHTML('beforeend', TOOLS.map(t => `<button type="button" class="tools-menu-item" data-tool="${t.id}" role="menuitem" onclick="showTool('${t.id}')"><span class="menu-icon">${t.icon}</span><span>${t.name}</span></button>`).join(''));
   document.querySelectorAll('[data-version]').forEach(e => e.textContent = VERSION);
+  sessRender(); rulesRender();
+  $('toolsMenu').querySelector('[data-tool="recallman"]').insertAdjacentHTML('afterend', ['simple','detailed'].map(m => `<button type="button" class="tools-menu-item" data-mode="${m}" role="menuitem" onclick="rmGo('${m}')"><span class="menu-icon">↳</span><span>${m === 'simple' ? 'الوضع المبسط' : 'الوضع المفصّل'}</span></button>`).join(''));
 }
 document.addEventListener('click', e => { const w = document.querySelector('.topbar-menu-wrap'); if(w && !w.contains(e.target)) closeToolsMenu(); });
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeToolsMenu(); });
@@ -979,8 +1254,9 @@ const LIB_DB = 'medicomman_lib', LIB_STORE = 'files', LIB_MAX = 8 * 1024 * 1024;
 
 function libOpen(){
   return new Promise((res, rej) => {
-    const r = indexedDB.open(LIB_DB, 1);
+    const r = indexedDB.open(LIB_DB, 2);
     r.onupgradeneeded = () => {
+      if(!r.result.objectStoreNames.contains('sessions')) r.result.createObjectStore('sessions', {keyPath:'id', autoIncrement:true});
       if(!r.result.objectStoreNames.contains(LIB_STORE))
         r.result.createObjectStore(LIB_STORE, {keyPath:'id', autoIncrement:true}).createIndex('name', 'name', {unique:false});
     };
@@ -988,10 +1264,10 @@ function libOpen(){
     r.onerror = () => rej(r.error);
   });
 }
-function libTx(mode, fn){
+function libTx(mode, fn, st = LIB_STORE){
   return libOpen().then(db => new Promise((res, rej) => {
-    const tx = db.transaction(LIB_STORE, mode);
-    const store = tx.objectStore(LIB_STORE);
+    const tx = db.transaction(st, mode);
+    const store = tx.objectStore(st);
     const req = fn(store);
     req.onsuccess = () => res(req.result);
     req.onerror = () => rej(req.error);
@@ -1118,7 +1394,8 @@ function collectGenInputs(){
     text: $('sourceText').value.trim(),
     numQ: num('numQ'), numClinical: num('numClinical'), numSA: num('numSA'),
     numLA: num('numLA'), numTF: num('numTF'), numF: num('numF'),
-    difficulty: $('difficulty').value
+    difficulty: $('difficulty').value,
+    focus: $('rmFocus').value, depth: $('rmDepth').value, note: $('rmNote').value.trim()
   };
 }
 function validateGenInputs(inp, allowEmptyMaterial = false){
@@ -1146,6 +1423,7 @@ function buildPromptText(inp){
     ? '\n\nالنص الدراسي:\n' + text
     : '\n\nالمادة الدراسية: لم تُرفق مادة داخل هذا البرومبت. بعد لصق البرومبت في تطبيق الذكاء الاصطناعي، أرفق أو ألصق المادة الدراسية، ثم طبّق التعليمات عليها. لا تعتمد على معلومات خارج المادة إلا إذا طُلب ذلك صراحة.';
 
+  if(rmMode === 'detailed') return masterPrompt(inp, typeReqs, clinicalNote, materialNote);
   return `أنت مساعد مذاكرة طبي. من المادة الدراسية التي سيقدمها المستخدم، جهّز:\n${typeReqs.join('\n')}\n\nمستوى الصعوبة المطلوب: ${DIFFICULTY_LABELS[difficulty] || DIFFICULTY_LABELS.adaptive}.${clinicalNote}\n\nمهم جدًا — لغة الرد:\n${langNote}\n\n${FORMAT_NOTE}\n\nأي نوع عدده صفر، أعده مصفوفة فارغة [] إن كان الرد JSON.${materialNote}`;
 }
 
@@ -1172,8 +1450,8 @@ async function copyPrompt(instructions, label){
     status.textContent = 'النسخ التلقائي غير متاح — انسخ يدويًا من الصندوق أدناه.';
   }
 }
-const copyPromptJson = () => copyPrompt(MANUAL_JSON_INSTRUCTIONS, 'للاستخدام هنا');
-const copyPromptReadable = () => copyPrompt(MANUAL_READABLE_INSTRUCTIONS, 'للرد المباشر');
+const copyPromptJson = () => copyPrompt(rmMode === 'detailed' ? JSON_D : MANUAL_JSON_INSTRUCTIONS, 'للاستخدام هنا');
+const copyPromptReadable = () => copyPrompt(rmMode === 'detailed' ? READ_D : MANUAL_READABLE_INSTRUCTIONS, 'للرد المباشر');
 
 /* ===== 8) عرض النتائج ===== */
 /** Minimal markdown → HTML for answers/explanations */
@@ -1298,7 +1576,8 @@ function renderResults(parsed){
   showTab(activeTab);
 }
 
-function displayParsedResults(parsed){
+function displayParsedResults(parsed, skipSave){
+  fixOpts(parsed); flagSet = {}; rmExam(false, true); deckOn = false;
   resultsCache = {ar:null, en:null, mixed:null};
   resultsCache[genLang] = parsed;
   lastParsed = parsed;
@@ -1308,6 +1587,8 @@ function displayParsedResults(parsed){
   activeTab = 'mcq';
   renderResults(parsed);
   $('pastedResponse').value = JSON.stringify(parsed, null, 2);   // لإعادة الاستخدام لاحقًا
+  $('resEmpty').style.display = 'none'; rmTab('res');
+  if(!skipSave) sessSave(parsed);
 }
 
 // MCQ والسريرية وصح/خطأ: نفس البنية، الاختيار يظهر الصح والخطأ والتعليل فورًا ثم يُثبَّت
@@ -1316,25 +1597,28 @@ function renderQuiz(type, list){
   wrap.innerHTML = '';
   if(!list.length){ wrap.innerHTML = `<div class="empty">${d.empty}</div>`; return; }
   list.forEach((q, qi) => {
-    const box = mk('div', 'mcq', (type === 'clinical' ? scenarioHtml(q.scenario) : '') + `<div class="q">${qi+1}. ${isTF ? q.statement : q.question}</div>`);
+    const box = mk('div', 'mcq', (type === 'clinical' ? scenarioHtml(q.scenario) : '') + `<div class="q">${qi+1}. ${isTF ? q.statement : q.question}</div>` + metaHtml(q));
+    box.dataset.y = isTrap(q) ? 't' : 'n';
     const optsWrap = isTF ? mk('div', 'tf-options') : box;
     const correctIdx = isTF ? (q.is_true ? 0 : 1) : q.correct_index;
     (isTF ? ['true','false'] : (q.options || [])).forEach((label, oi) => {
       const o = mk('div', 'opt');
       o.textContent = label;
       o.onclick = () => {
+        if(examMode){ if(examDone) return; userAnswers[type][qi] = isTF ? oi === 0 : oi; optsWrap.querySelectorAll('.opt').forEach(el => el.classList.remove('selected')); o.classList.add('selected'); return; }
         if(userAnswers[type][qi] != null) return;
         userAnswers[type][qi] = isTF ? oi === 0 : oi;
         const opts = [...optsWrap.querySelectorAll('.opt')];
         opts.forEach(el => el.classList.remove('correct','wrong','selected'));
         if(oi === correctIdx) o.classList.add('correct');
         else { o.classList.add('wrong'); if(opts[correctIdx]) opts[correctIdx].classList.add('correct'); }
-        showExpl(box, q.explanation);
+        showExpl(box, expl2(q));
       };
       optsWrap.appendChild(o);
     });
     if(isTF) box.appendChild(optsWrap);
     box.appendChild(mk('div', 'expl'));
+    addFlag(box, type + qi);
     wrap.appendChild(box);
   });
   const actions = mk('div', 'score-actions');
@@ -1351,7 +1635,9 @@ function renderReveal(type, list){
   wrap.innerHTML = '';
   if(!list.length){ wrap.innerHTML = `<div class="empty">${d.empty}</div>`; return; }
   list.forEach((q, qi) => {
-    const box = mk('div', 'sa', `<div class="q">${qi+1}. ${q.question}</div><button class="btn-primary">إظهار الإجابة</button><div class="ans"><div class="md-body">${renderMarkdown(q.answer || '')}</div></div>`);
+    const box = mk('div', 'sa', `<div class="q">${qi+1}. ${q.question}</div>${metaHtml(q)}<button class="btn-primary">إظهار الإجابة</button><div class="ans"><div class="md-body">${renderMarkdown(q.answer || '')}</div></div>`);
+    box.dataset.y = isTrap(q) ? 't' : 'n';
+    addFlag(box, type + qi);
     const btn = box.querySelector('button'), ans = box.querySelector('.ans');
     btn.onclick = () => {
       const showing = ans.style.display === 'block';
@@ -1374,12 +1660,14 @@ function renderFlashcards(list){
       const side = flipped ? 'الإجابة' : 'السؤال';
       const body = flipped ? renderMarkdown(c.back||'') : renderMarkdown(c.front||'');
       el.classList.toggle('flipped', flipped);
-      el.innerHTML = `<div class="num">${i+1}</div><div><div class="side">${side}</div><div class="txt md-body">${body}</div></div>`;
+      el.innerHTML = `<div class="num">${i+1}</div><div><div class="side">${side}</div>${metaHtml(c)}<div class="txt md-body">${body}</div></div>`;
     }
     render();
     el.onclick = () => { flipped = !flipped; render(); };
     wrap.appendChild(el);
   });
+  wrap.prepend(mk('div', 'chips dtl deckbar', `<button type="button" class="chip" onclick="deckMode(0)">شبكة</button><button type="button" class="chip" onclick="deckMode(1)">بطاقة واحدة</button><button type="button" class="chip deck-nav" onclick="deckStep(-1)">السابق</button><span class="tag" id="deckCnt"></span><button type="button" class="chip deck-nav" onclick="deckStep(1)">التالي</button>`));
+  deckApply();
 }
 
 /* ===== 9) التقييم ===== */
@@ -1549,7 +1837,7 @@ async function generate(){
   try{
     const data = await callGeminiWithRetry({
       contents: [{parts}],
-      generationConfig: {responseMimeType:"application/json", responseSchema:SCHEMA, thinkingConfig:{thinkingLevel:"high"}}
+      generationConfig: {responseMimeType:"application/json", responseSchema:rmMode === 'detailed' ? SCHEMA_D : SCHEMA, ...(rmMode === 'detailed' ? {temperature:0.65} : {}), thinkingConfig:{thinkingLevel:"high"}}
     }, (model, attempt, max, reason) => { status.textContent = `${reason} (${model})، محاولة ${attempt}/${max}...`; },
        (oldModel, newModel) => { status.textContent = `${oldModel} فشل بعد 3 محاولات، التحويل إلى ${newModel}...`; });
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
