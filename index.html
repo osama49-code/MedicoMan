@@ -541,6 +541,56 @@ body.rm-on .page-jumpers{bottom:68px}
 .info-it{padding:10px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.8;color:var(--ink)}
 .info-it b{display:block;color:var(--expl-label)}
 .info-it span{display:block;color:var(--muted)}
+
+.res-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.seg{display:inline-flex;background:var(--input-bg);border:1px solid var(--line);border-radius:var(--radius-pill);padding:4px;gap:4px}
+.seg button{border:none;background:transparent;padding:8px 18px;border-radius:var(--radius-pill);font:inherit;font-weight:700;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--grad-accent);color:#0B1C2C}
+#tool-recallman.detailed .seg.dtl{display:inline-flex}
+.fchips .chip b{margin-inline-start:6px;background:rgba(0,0,0,.08);border-radius:10px;padding:0 7px;font-size:12px}
+.tm{position:sticky;top:60px;z-index:45;display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:8px 14px;margin-bottom:12px}
+.tm span{font:700 20px/1 ui-monospace,Consolas,monospace;color:var(--ink);min-width:72px}
+.tm-bar{flex:1;height:6px;background:var(--line);border-radius:6px;overflow:hidden}
+.tm-bar i{display:block;height:100%;width:100%;background:var(--grad-accent);transition:width .5s linear}
+.tm.warn .tm-bar i{background:#F59E0B}
+.tm.crit .tm-bar i{background:#DC2626}
+.tm.crit span{color:#DC2626;animation:tmp 1s infinite}
+@keyframes tmp{50%{opacity:.45}}
+.exlock .mcq,.exlock .sa{pointer-events:none;opacity:.55}
+#examScore{font-weight:700;color:var(--ink);font-size:15px}
+.crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:4px 0 10px;font-size:13px}
+.crumbs button{border:none;background:none;color:var(--expl-label);font:inherit;font-weight:700;cursor:pointer;padding:2px 4px}
+.lib-item.sess{display:flex;align-items:center;gap:8px}
+.sess-main{flex:1;min-width:0}
+.sess-t{display:flex;align-items:center;gap:6px}
+.sess-t b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sess-m{display:flex;flex-wrap:wrap;gap:8px;margin-top:3px}
+.sheet-btn{display:block;width:100%;text-align:center;padding:12px;margin:8px 0;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.sheet-btn.danger{color:var(--danger)}
+.pdf-pg{width:794px;height:1123px;box-sizing:border-box;padding:48px;background:#fff;color:#111;overflow:hidden;font-size:15px;line-height:1.7}
+.pdf-h{border-bottom:2px solid #0D9488;margin-bottom:16px;padding-bottom:10px;color:#444}
+.pdf-h h1{margin:0 0 4px;font-size:24px;color:#111}
+.pdf-q{margin:0 0 14px}
+.pdf-o{margin:2px 18px}
+.pdf-o span{font-weight:700}
+.pdf-e{margin:0 0 10px;white-space:pre-wrap;font-size:13.5px}
+.pdf-k{font-weight:700;margin:6px 0 10px}
+
+.lib-item.sess{display:flex;flex-direction:column;align-items:stretch;gap:10px;position:relative;padding:14px 16px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+.lib-item.sess::before{content:'';position:absolute;inset-block:14px;inset-inline-start:0;width:4px;border-radius:4px;background:var(--grad-accent)}
+.lib-item.sess:hover{border-color:var(--accent)}
+.sess-t{display:flex;align-items:flex-start;gap:10px}
+.sess-ic{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--expl-bg);font-size:18px}
+.sess-t b{flex:1;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word;line-height:1.6;font-size:15.5px;color:var(--ink)}
+.sess-t .badge{flex:none;margin-top:3px}
+.sess-m{display:flex;flex-wrap:wrap;gap:6px;margin:0}
+.sess-m .tag{background:var(--input-bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px}
+.sess-act{display:flex;gap:8px;align-items:center}
+.sess-act .btn-secondary{flex:1}
+.sess-act .rule-pen{width:42px;height:38px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:18px;color:var(--ink)}
+.lib-item.folder{cursor:pointer}
+.lib-item.folder .sess-t{padding-inline-end:44px}
+.lib-item.folder .rule-pen{position:absolute;top:10px;inset-inline-end:10px;width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:18px;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -621,6 +671,13 @@ body.rm-on .page-jumpers{bottom:68px}
     </div>
   </div>
 
+  <div class="card" id="contCard">
+    <h2>أسئلة جديدة على نفس الملف</h2>
+    <p class="hint">ولّد دفعة جديدة على مادة سبق العمل عليها، ولن تتكرر الأسئلة السابقة.</p>
+    <div class="chips"><button type="button" class="chip" onclick="contFromCurrent()">على الملف الحالي</button><button type="button" class="chip" onclick="contFromLibrary()">اختيار من المكتبة…</button></div>
+    <div class="mode-bar" id="contBanner" style="display:none;margin:0"><span class="mode-name" id="contName"></span><button type="button" class="btn-secondary" onclick="contCancel()">إلغاء ✕</button></div>
+  </div>
+
   <div class="card">
     <h2>المادة الدراسية</h2>
     <p class="hint">ألصق نصًا، أو ارفع ملفًا: TXT أو MD أو PDF أو DOCX أو صورة (JPG/PNG). لغة الأسئلة والإجابات تتبع الزر المختار أعلاه.</p>
@@ -651,7 +708,8 @@ body.rm-on .page-jumpers{bottom:68px}
         <option value="comprehensive">شامل: أهم المواضع + التفاصيل الدقيقة</option>
         <option value="core">الأكثر تكرارًا في الامتحانات</option>
         <option value="traps">صيد الفخاخ والتفاصيل الدقيقة</option>
-        <option value="differential">التفريق بين المتشابهات والتدبير</option></select></div>
+        <option value="differential">التفريق بين المتشابهات والتدبير</option>
+        <option value="all">كل ما سبق (الأنواع الأربعة معًا)</option></select></div>
       <div class="difficulty-wrap"><label>عمق الشرح <button type="button" class="info-btn" onclick="showInfo('depth')" aria-label="إرشادات" title="إرشادات">i</button></label><select id="rmDepth">
         <option value="full">شرح كامل (4 أجزاء)</option><option value="short">شرح مختصر للمراجعة السريعة</option></select></div>
       <div class="difficulty-wrap"><label>ملاحظة خاصة بهذه الدفعة</label><input type="text" id="rmNote" placeholder="مثال: ركّز على الجرعات وأسئلة الدكتور"></div>
@@ -717,16 +775,24 @@ body.rm-on .page-jumpers{bottom:68px}
         <button class="btn-primary" onclick="parsePastedResponse()">تحويل الرد إلى أسئلة</button>
         <span class="status" id="pasteStatus"></span>
       </div>
+      <div class="chips" style="margin:10px 0 0"><button type="button" class="chip" onclick="$('pasteImport').click()">استيراد من ملف</button><button type="button" class="chip" onclick="pasteExport()">تصدير الرد كنص</button></div>
+      <input type="file" id="pasteImport" accept=".txt,.json,text/plain,application/json" hidden onchange="pasteImportFile(this)">
     </div>
   </div>
 
   </div>
 <div id="rmP_lib" style="display:none">
-  <div class="card"><h2>مكتبة أعمالي</h2><p class="hint">كل توليد يُحفظ تلقائيًا بالمادة والملف والأسئلة. اضغط «فتح» للرجوع له.</p><div id="sessList"></div></div></div>
+  <div class="card"><h2>مكتبة أعمالي</h2><p class="hint">كل توليد أو لصق أو استيراد يُحفظ تلقائيًا بالمادة والملف والأسئلة.</p><div class="chips"><button type="button" class="chip" onclick="folderNew()">+ مجلد جديد</button><button type="button" class="chip" onclick="$('jsonImport').click()">استيراد JSON</button></div><div id="sessList"></div><input type="file" id="jsonImport" accept=".txt,.json,text/plain,application/json" hidden onchange="importJson(this)"></div></div>
 <div id="rmP_res" style="display:none"><div class="empty" id="resEmpty">لا توجد نتائج بعد. ولّد أسئلة من الصفحة الرئيسية أو افتح عملًا من المكتبة.</div>
   <div id="resultsWrap" style="display:none;">
-    <div class="chips dtl" id="examBar"><button type="button" class="chip on" id="exM0" onclick="rmExam(false)">وضع المذاكرة</button><button type="button" class="chip" id="exM1" onclick="rmExam(true)">وضع الامتحان</button><span class="tag" id="examTimer"></span><button type="button" class="chip" id="examEnd" style="display:none" onclick="examFinish()">إنهاء وتصحيح</button><span class="tag" id="examScore"></span></div>
-    <div class="chips dtl"><button type="button" class="chip on" id="yf0" onclick="yieldFilter(0)">كل الأسئلة</button><button type="button" class="chip" id="yf1" onclick="yieldFilter(1)">الفخاخ والتفاصيل الدقيقة فقط</button><button type="button" class="chip" id="yf2" onclick="yieldFilter(2)">المعلّمة للمراجعة</button></div>
+    <div class="res-head">
+      <div class="seg dtl"><button type="button" class="on" id="exM0" onclick="rmExam(false)">وضع المذاكرة</button><button type="button" id="exM1" onclick="rmExam(true)">وضع الامتحان</button></div>
+      <div class="chips" style="margin:0"><button type="button" class="chip" onclick="exportJson()">تصدير JSON (نص)</button><button type="button" class="chip" onclick="copyJson()">نسخ</button><button type="button" class="chip" onclick="$('jsonImport').click()">استيراد JSON</button></div>
+    </div>
+    <div class="dtl" id="examCfg" style="display:none;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><label style="margin:0">مدة الامتحان كاملًا (بالدقائق)</label><input type="number" id="exMin" min="1" max="600" value="30" style="width:90px"><button type="button" class="btn-primary" onclick="examBegin()">ابدأ الامتحان</button></div>
+    <div class="tm" id="tm" style="display:none"><span id="tmTxt">00:00</span><div class="tm-bar"><i id="tmFill"></i></div><button type="button" class="chip" id="examEnd" onclick="examFinish()">إنهاء وتصحيح</button></div>
+    <div id="examScore"></div>
+    <div class="chips dtl fchips"><button type="button" class="chip on" id="yf0" onclick="yieldFilter(0)">كل الأسئلة <b id="cnt0">0</b></button><button type="button" class="chip" id="yf1" onclick="yieldFilter(1)">الفخاخ والتفاصيل الدقيقة <b id="cnt1">0</b></button><button type="button" class="chip" id="yf2" onclick="yieldFilter(2)">المعلّمة للمراجعة <b id="cnt2">0</b></button></div>
     <div class="tabs" id="tabsBar"></div>
     <div class="random-mode-bar">
       <button class="random-mode-btn" id="randomModeBtn" onclick="startRandomQuiz()">اختبار عشوائي</button>
@@ -824,7 +890,7 @@ body.rm-on .page-jumpers{bottom:68px}
    ============================================================ */
 
 /* ===== 1) الثوابت ===== */
-const VERSION = 'V9';
+const VERSION = 'V12';
 // تسجيل الأدوات: أداة جديدة = عنصر هنا + <div class="wrap view-hidden" id="tool-ID"> في الصفحة
 const TOOLS = [
   {id:'recallman', icon:'🧠', name:'RecallMan', desc:'حوّل محاضراتك إلى أسئلة متنوعة وبطاقات مراجعة بمستوى صعوبة تختاره.'},
@@ -916,7 +982,8 @@ const FOCUS_D = {
   comprehensive: '70% من البؤر الامتحانية الكلاسيكية (مقارنات، خط أول، فحص أولي مقابل مؤكد، الأشيع مقابل الأخطر، علامات واسمة، أرقام فاصلة، موانع) و30% من التفاصيل الدقيقة والاستثناءات والهوامش.',
   core: '85% للبؤر الأعلى ورودًا التي لا يخلو منها امتحان، و15% لأهم استثناءاتها.',
   traps: '55% فخاخ واستثناءات وهوامش وتشابه لفظي مضلل، و45% نقاط تمييز؛ أسئلة تبدو مألوفة وفيها تفصيلة تقلب الإجابة.',
-  differential: 'ابنِ الأسئلة على التفريق بين المتشابهات وترتيب الخطوات (ماذا تفعل أولًا؟ ما العلامة التي ترجّح أ على ب؟)، وبدائل تمثل قرارات صحيحة في حالات مجاورة.'};
+  differential: 'ابنِ الأسئلة على التفريق بين المتشابهات وترتيب الخطوات (ماذا تفعل أولًا؟ ما العلامة التي ترجّح أ على ب؟)، وبدائل تمثل قرارات صحيحة في حالات مجاورة.',
+  all: 'وزّع الأسئلة بالتساوي تقريبًا على أربعة محاور: (1) البؤر الامتحانية الكلاسيكية، (2) المواضع الأعلى تكرارًا، (3) الفخاخ والتفاصيل الدقيقة والاستثناءات، (4) التفريق بين المتشابهات والتدبير. لا يطغَ محور على آخر، وتنوّع قيم exam_yield بما يعكس المحاور الأربعة.'};
 const EXPL_D = {
   full: 'الشرح إلزامي من 4 أجزاء بعناوين عريضة: **1. مفتاح الحل والقرينة** ثم **2. الآلية العلمية** ثم **3. تشريح البدائل الخاطئة ومتى تصح** ثم **4. فخ الامتحان**. يُمنع الشرح من سطر أو سطرين.',
   short: 'شرح مركز من 3 نقاط: سبب صحة الإجابة مع القرينة، سبب استبعاد أقرب بديلين، وخلاصة امتحانية في جملة.'};
@@ -975,12 +1042,13 @@ function rulesRender(){
 }
 function masterPrompt(inp, reqs, clin, mat){
   const rules = activeRules().map((d, i) => `${i + 1}. ${d}`).join('\n');
-  return `أنت كبير واضعي الأسئلة الامتحانية وخبير القياس والتقويم الأكاديمي والطبي. مهمتك بناء بنك أسئلة بمعايير لجان الامتحانات والبورد، يغطي المواضع المتكررة والتفاصيل الدقيقة الفارقة.\n\nالمطلوب بالضبط:\n${reqs.join('\n')}${clin}\n\n## اللغة\n${LANG_D[genLang] || LANG_D.en}\n\n## الصعوبة\n${DIFF_D[inp.difficulty] || DIFF_D.adaptive}\n\n## التركيز\n${FOCUS_D[inp.focus] || FOCUS_D.comprehensive}\n\n## القواعد الإلزامية\n${rules}\n\n## الشرح\n${EXPL_D[inp.depth] || EXPL_D.full}\n\nتصنيف exam_yield: high_yield = موضع متكرر، exam_trap = فخ شائع، subtle_nuance = تفصيلة دقيقة، differential_pivot = نقطة تفريق، core_concept = قاعدة أساسية.\n\nلا تضع A. أو B. داخل نص الاختيارات.${inp.note ? '\n\nتوجيه خاص لهذه الدفعة: ' + inp.note : ''}\n\nأي نوع عدده صفر أعده مصفوفة فارغة [] إن كان الرد JSON.${mat}`;
+  return `أنت كبير واضعي الأسئلة الامتحانية وخبير القياس والتقويم الأكاديمي والطبي. مهمتك بناء بنك أسئلة بمعايير لجان الامتحانات والبورد، يغطي المواضع المتكررة والتفاصيل الدقيقة الفارقة.\n\nالمطلوب بالضبط:\n${reqs.join('\n')}${clin}\n\n## اللغة\n${LANG_D[genLang] || LANG_D.en}\n\n## الصعوبة\n${DIFF_D[inp.difficulty] || DIFF_D.adaptive}\n\n## التركيز\n${FOCUS_D[inp.focus] || FOCUS_D.comprehensive}\n\n## القواعد الإلزامية\n${rules}\n\n## الشرح\n${EXPL_D[inp.depth] || EXPL_D.full}\n\nتصنيف exam_yield: high_yield = موضع متكرر، exam_trap = فخ شائع، subtle_nuance = تفصيلة دقيقة، differential_pivot = نقطة تفريق، core_concept = قاعدة أساسية.\n\nلا تضع A. أو B. داخل نص الاختيارات.\nأضف الحقل lesson_title بعنوان الدرس أو الموضوع الرئيسي للمادة.${inp.note ? '\n\nتوجيه خاص لهذه الدفعة: ' + inp.note : ''}\n\nأي نوع عدده صفر أعده مصفوفة فارغة [] إن كان الرد JSON.${mat}`;
 }
-const JSON_D = MANUAL_JSON_INSTRUCTIONS + '\nأضف لكل عنصر في كل الأنواع الحقلين exam_yield (high_yield | exam_trap | subtle_nuance | differential_pivot | core_concept) و topic_tag، ولأسئلة MCQ والسريرية وصح/خطأ حقل key_clue أيضًا.';
+const JSON_D = MANUAL_JSON_INSTRUCTIONS + '\nأضف لكل عنصر في كل الأنواع الحقلين exam_yield (high_yield | exam_trap | subtle_nuance | differential_pivot | core_concept) و topic_tag، ولأسئلة MCQ والسريرية وصح/خطأ حقل key_clue أيضًا. وأضف في أعلى الكائن حقلًا نصيًا lesson_title بعنوان الدرس.';
 const READ_D = MANUAL_READABLE_INSTRUCTIONS + '\n- ابدأ بخريطة أهم 5 فخاخ ومواضع امتحانية في المادة.\n- اعرض الأسئلة بدون إجاباتها، ثم ضع «نموذج الإجابات والتشريح» في آخر كل قسم.';
 const X = {exam_yield:str, topic_tag:str}, XK = {...X, key_clue:str};
 const SCHEMA_D = {type:'object', required:KEYS, properties:{
+  lesson_title: str,
   mcqs: arr({question:str, options:strList, correct_index:{type:'integer'}, explanation:str, ...XK}),
   clinical: arr({scenario:str, question:str, options:strList, correct_index:{type:'integer'}, explanation:str, ...XK}),
   short_answer: arr({...QA, ...X}), long_answer: arr({...QA, ...X}),
@@ -1003,37 +1071,191 @@ function rmPreset(p){
 }
 function yieldFilter(k){ const w = $('resultsWrap'); w.classList.toggle('trapsonly', k === 1); w.classList.toggle('flagsonly', k === 2); [0,1,2].forEach(i => $('yf' + i).classList.toggle('on', i === k)); }
 
-/* ===== سجل الأعمال (IndexedDB) ===== */
-const SESS = 'sessions';
-const sessAll = () => libTx('readonly', s => s.getAll(), SESS).then(v => v || []);
-async function sessSave(data){
-  const text = $('sourceText').value.trim();
-  const n = KEYS.reduce((a, k) => a + (data[k] || []).length, 0);
-  const rec = {title: curFileName || text.slice(0, 45) || 'عمل بدون عنوان', at: Date.now(), mode: rmMode, lang: genLang, diff: $('difficulty').value, text, file: uploadedImage ? {...uploadedImage, name: curFileName} : null, n, data};
-  try{ await libTx('readwrite', s => s.add(rec), SESS); sessRender(); }
-  catch(e){ showToast('تعذّر حفظ العمل في السجل.'); }
+/* ===== مكتبة الأعمال: عناوين، ترقيم، مجلدات، تصدير واستيراد ===== */
+const SESS = 'sessions', FOLD = 'folders';
+let curFolder = null, displaySrc = 'gen', sheetFns = [];
+const dbAll = st => libTx('readonly', s => s.getAll(), st).then(v => v || []);
+const dbGet = (st, id) => libTx('readonly', s => s.get(id), st);
+const dbPut = (st, o) => libTx('readwrite', s => s.put(o), st);
+const dbAdd = (st, o) => libTx('readwrite', s => s.add(o), st);
+const dbDel = (st, id) => libTx('readwrite', s => s.delete(id), st);
+const safeName = s => String(s).replace(/[\\\/:*?"<>|]/g, '-').trim().slice(0, 80) || 'MedicoMan';
+const tNorm = t => t.trim().replace(/\s+/g, ' ').toLowerCase();
+const normParsed = p => ({...Object.fromEntries(KEYS.map(k => [k, Array.isArray(p[k]) ? p[k] : []])), lesson_title: p.lesson_title || ''});
+function lessonTitle(d, text){
+  const clean = s => String(s || '').replace(/[#*_`>|\[\]]/g, '').replace(/\s+/g, ' ').trim();
+  let t = clean(d && d.lesson_title);
+  if(!t && curFileName) t = curFileName.replace(/\.[^.]+$/, '');
+  if(!t && text){ const l = text.split('\n').map(clean).find(x => x.length > 2); if(l) t = l.slice(0, 50); }
+  if(!t && d){ for(const k of KEYS){ const q = (d[k] || []).find(x => x.topic_tag); if(q){ t = q.topic_tag; break; } } }
+  return t || 'عمل بدون عنوان';
 }
+async function sessSave(data){
+  const text = $('sourceText').value.trim(), title = contWork ? contWork.title : lessonTitle(data, text), key = tNorm(title);
+  const n = KEYS.reduce((a, k) => a + (data[k] || []).length, 0);
+  try{
+    const all = await dbAll(SESS);
+    const runNo = Math.max(0, ...all.filter(s => s.tkey === key).map(s => s.runNo || 0)) + 1;
+    await dbAdd(SESS, {title, tkey:key, runNo, src:displaySrc, folderId:null, at:Date.now(), mode:rmMode, lang:genLang, diff:$('difficulty').value, text, file: uploadedImage ? {...uploadedImage, name:curFileName} : null, n, data});
+    if(contWork) contWork.prev = contWork.prev.concat(qStems(data));
+  }catch(e){ showToast('تعذّر حفظ العمل في المكتبة.'); }
+  displaySrc = 'gen'; sessRender();
+}
+const SRC_AR = {gen:'مولّد من الموقع', paste:'ملصوق من خارج الموقع', import:'مستورد من ملف'};
+function goFolder(id){ curFolder = id; sessRender(); }
 async function sessRender(){
   const box = $('sessList'); if(!box) return;
-  let items = []; try{ items = await sessAll(); }catch(e){ box.innerHTML = '<div class="lib-empty">تعذّر فتح السجل.</div>'; return; }
-  items.sort((a, b) => b.at - a.at);
-  box.innerHTML = items.length ? items.map(s => `<div class="lib-item"><span class="lib-name" title="${libEsc(s.title)}">${s.file ? '📎' : '📝'} ${libEsc(s.title)}</span><span class="lib-meta">${s.n} عنصر · ${new Date(s.at).toLocaleDateString('ar-EG')}</span><button type="button" class="btn-secondary" onclick="sessOpen(${s.id})">فتح</button><button type="button" class="lib-del" onclick="sessDel(${s.id})" title="حذف">🗑</button></div>`).join('') : '<div class="lib-empty">لا توجد أعمال محفوظة بعد.</div>';
+  let ss = [], fs = [];
+  try{ ss = await dbAll(SESS); fs = await dbAll(FOLD); }catch(e){ box.innerHTML = '<div class="lib-empty">تعذّر فتح المكتبة.</div>'; return; }
+  if(curFolder != null && !fs.some(f => f.id === curFolder)) curFolder = null;
+  const path = []; for(let f = fs.find(x => x.id === curFolder); f; f = fs.find(x => x.id === f.parentId)) path.unshift(f);
+  const inF = v => (v == null ? null : v) === curFolder;
+  const kids = fs.filter(f => inF(f.parentId)).sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+  const items = ss.filter(s => inF(s.folderId)).sort((a, b) => b.at - a.at);
+  const cnt = id => ss.filter(s => s.folderId === id).length + fs.filter(f => f.parentId === id).length;
+  let h = `<div class="crumbs"><button type="button" onclick="goFolder(null)">المكتبة</button>${path.map(f => `<span>›</span><button type="button" onclick="goFolder(${f.id})">${libEsc(f.name)}</button>`).join('')}</div>`;
+  h += kids.map(f => `<div class="lib-item sess folder" onclick="goFolder(${f.id})"><div class="sess-t"><span class="sess-ic">📁</span><b>${libEsc(f.name)}</b></div><div class="sess-m"><span class="tag">${cnt(f.id)} عنصر</span></div><button type="button" class="rule-pen" onclick="event.stopPropagation();folderMenu(${f.id})" title="خيارات">⋯</button></div>`).join('');
+  h += items.map(s => `<div class="lib-item sess"><div class="sess-t"><span class="sess-ic">${s.file ? '📎' : '📝'}</span><b>${libEsc(s.customName || s.title)}</b><span class="badge">#${s.runNo || 1}</span></div><div class="sess-m"><span class="tag">${SRC_AR[s.src] || SRC_AR.gen}</span><span class="tag">${s.n} عنصر</span><span class="tag">${new Date(s.at).toLocaleDateString('ar-EG')}</span></div><div class="sess-act"><button type="button" class="btn-secondary" onclick="sessOpen(${s.id})">فتح</button><button type="button" class="rule-pen" onclick="sessMenu(${s.id})" title="خيارات">⋯</button></div></div>`).join('');
+  box.innerHTML = h + (kids.length || items.length ? '' : '<div class="lib-empty">لا توجد أعمال هنا بعد.</div>');
 }
 async function sessOpen(id){
-  const s = await libTx('readonly', st => st.get(id), SESS); if(!s) return;
+  const s = await dbGet(SESS, id); if(!s) return;
   $('sourceText').value = s.text || '';
   uploadedImage = s.file ? {mimeType: s.file.mimeType, base64: s.file.base64} : null;
   curFileName = s.file ? s.file.name : null;
   $('fileStatus').textContent = s.file ? '📎 ' + (s.file.name || 'ملف محفوظ') : '';
   genLang = s.lang || 'en'; $('difficulty').value = s.diff || 'adaptive';
-  rmSetMode(s.mode || 'simple');
-  displayParsedResults(s.data, true);
-  $('resultsWrap').scrollIntoView({behavior:'smooth'});
+  rmSetMode(s.mode || 'simple'); displayParsedResults(s.data, true);
   showToast('تم فتح العمل المحفوظ ✓', true);
 }
-async function sessDel(id){
-  if(!confirm('حذف هذا العمل من السجل؟')) return;
-  await libTx('readwrite', s => s.delete(id), SESS); sessRender();
+function sheet(title, items){
+  sheetFns = items.map(i => i[1]); $('infoT').textContent = title;
+  $('infoB').innerHTML = items.map((i, k) => `<button type="button" class="sheet-btn${i[2] ? ' danger' : ''}" onclick="sheetRun(${k})">${i[0]}</button>`).join('');
+  $('infoOv').classList.add('open');
+}
+function sheetRun(k){ infoClose(); const f = sheetFns[k]; if(f) f(); }
+async function sessMenu(id){ const s = await dbGet(SESS, id); if(!s) return; sheet(s.customName || s.title, [['إعادة تسمية', () => sessRename(id)], ['نقل إلى مجلد…', () => moveTo('s', id)], ['تصدير JSON (نص)', () => sessExport(id)], ['حذف', () => sessDel(id), 1]]); }
+async function folderMenu(id){ const f = await dbGet(FOLD, id); if(!f) return; sheet(f.name, [['إعادة تسمية', () => folderRename(id)], ['نقل إلى مجلد…', () => moveTo('f', id)], ['حذف المجلد وكل ما فيه', () => folderDelete(id), 1]]); }
+async function sessRename(id){ const s = await dbGet(SESS, id); const n = (prompt('الاسم الجديد', s.customName || s.title) || '').trim(); if(!n) return; s.customName = n; await dbPut(SESS, s); sessRender(); }
+async function folderRename(id){ const f = await dbGet(FOLD, id); const n = (prompt('اسم المجلد', f.name) || '').trim(); if(!n) return; f.name = n; await dbPut(FOLD, f); sessRender(); }
+async function folderNew(){ const n = (prompt('اسم المجلد الجديد') || '').trim(); if(!n) return; await dbAdd(FOLD, {name:n, parentId:curFolder, createdAt:Date.now()}); sessRender(); }
+async function sessDel(id){ if(!confirm('حذف هذا العمل من المكتبة؟')) return; await dbDel(SESS, id); sessRender(); }
+const folderTree = (fs, id) => { const ids = [id]; for(let i = 0; i < ids.length; i++) fs.filter(f => f.parentId === ids[i]).forEach(f => ids.push(f.id)); return ids; };
+async function folderDelete(id){
+  const fs = await dbAll(FOLD), ss = await dbAll(SESS), ids = folderTree(fs, id), ns = ss.filter(s => ids.includes(s.folderId));
+  if(!confirm(`سيتم حذف المجلد وكل ما فيه (${ns.length} عمل و${ids.length - 1} مجلد فرعي) نهائيًا. هل أنت متأكد؟`)) return;
+  for(const s of ns) await dbDel(SESS, s.id);
+  for(const i of ids) await dbDel(FOLD, i);
+  if(ids.includes(curFolder)) curFolder = null; sessRender();
+}
+async function moveTo(kind, id){
+  const fs = await dbAll(FOLD), bad = kind === 'f' ? folderTree(fs, id) : [];
+  const label = f => { const p = []; for(let x = f; x; x = fs.find(y => y.id === x.parentId)) p.unshift(x.name); return '📁 ' + p.join(' › '); };
+  const go = async t => { const r = await dbGet(kind === 's' ? SESS : FOLD, id); if(kind === 's') r.folderId = t; else r.parentId = t; await dbPut(kind === 's' ? SESS : FOLD, r); sessRender(); showToast('تم النقل ✓', true); };
+  sheet('نقل إلى', [['📚 المكتبة (الجذر)', () => go(null)], ...fs.filter(f => !bad.includes(f.id)).map(f => [libEsc(label(f)), () => go(f.id)])]);
+}
+/* --- تصدير واستيراد JSON وحفظ الملفات --- */
+const jsonText = (d, title) => JSON.stringify({lesson_title: title, ...d}, null, 2);
+const blobB64 = b => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(String(fr.result).split(',')[1]); fr.readAsDataURL(b); });
+async function saveOut(name, blob){
+  const C = window.Capacitor, P = C && C.Plugins;
+  if(C && C.isNativePlatform && C.isNativePlatform() && P && P.Filesystem && P.Share){
+    const r = await P.Filesystem.writeFile({path: name, data: await blobB64(blob), directory: 'CACHE'});
+    await P.Share.share({title: name, url: r.uri}); return;
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+async function exportJson(){
+  if(!lastParsed){ showToast('لا توجد نتائج لتصديرها.'); return; }
+  const t = lessonTitle(lastParsed, $('sourceText').value.trim());
+  try{ await saveOut(safeName(t) + '.txt', new Blob([jsonText(lastParsed, t)], {type:'text/plain;charset=utf-8'})); }catch(e){ showError('تعذّر حفظ الملف: ' + e.message); }
+}
+async function sessExport(id){ const s = await dbGet(SESS, id); try{ await saveOut(safeName(s.customName || s.title) + '-' + (s.runNo || 1) + '.txt', new Blob([jsonText(s.data, s.title)], {type:'text/plain;charset=utf-8'})); }catch(e){ showError('تعذّر حفظ الملف: ' + e.message); } }
+async function copyJson(){
+  if(!lastParsed){ showToast('لا توجد نتائج لنسخها.'); return; }
+  try{ await navigator.clipboard.writeText(jsonText(lastParsed, lessonTitle(lastParsed, $('sourceText').value.trim()))); showToast('تم نسخ JSON ✓', true); }catch(e){ showToast('تعذّر النسخ.'); }
+}
+async function importJson(inp){
+  const f = inp.files[0]; inp.value = ''; if(!f) return;
+  try{ const p = parseLooseJson(await f.text()); displaySrc = 'import'; displayParsedResults(normParsed(p)); }
+  catch(e){ showError('تعذّر استيراد الملف كـ JSON صحيح. (' + e.message + ')'); }
+}
+/* --- PDF للاختبار العشوائي (صور صفحات لضمان العربية) --- */
+const loadJs = s => new Promise((ok, no) => { if(document.querySelector(`script[src="${s}"]`)) return ok(); const e = document.createElement('script'); e.src = s; e.onload = ok; e.onerror = () => no(new Error('تعذّر تحميل مكتبة PDF، تأكد من الإنترنت')); document.head.appendChild(e); });
+async function exportQuizPdf(withKey){
+  if(!randomQuiz.length) return;
+  try{
+    showToast('جارٍ إنشاء الـ PDF…');
+    await loadJs('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    await loadJs('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    const en = genLang === 'en', L = 'ABCD', esc = pmEsc, title = lessonTitle(lastParsed || {}, $('sourceText').value.trim());
+    const holder = document.createElement('div'); holder.style.cssText = 'position:fixed;left:-10000px;top:0'; document.body.appendChild(holder);
+    const pages = []; let pg = null;
+    const newPg = () => { pg = document.createElement('div'); pg.className = 'pdf-pg'; pg.dir = en ? 'ltr' : 'rtl'; holder.appendChild(pg); pages.push(pg); };
+    const add = h => { const d = document.createElement('div'); d.innerHTML = h; const el = d.firstChild; pg.appendChild(el); if(pg.scrollHeight > pg.clientHeight && pg.children.length > 1){ pg.removeChild(el); newPg(); pg.appendChild(el); } };
+    newPg();
+    add(`<div class="pdf-h"><h1>${esc(title)}</h1><div>${randomQuiz.length} ${en ? 'questions' : 'سؤال'} · ${new Date().toLocaleDateString(en ? 'en-GB' : 'ar-EG')}</div></div>`);
+    randomQuiz.forEach((q, i) => {
+      const tf = q.type === 'tf', opts = tf ? (en ? ['True', 'False'] : ['صح', 'خطأ']) : (q.options || []);
+      add(`<div class="pdf-q"><b>${i + 1}.</b> ${q.type === 'clinical' ? `<i>${esc(q.scenario)}</i><br>` : ''}${esc(tf ? q.statement : q.question)}${opts.map((o, k) => `<div class="pdf-o"><span>${L[k]})</span> ${esc(o)}</div>`).join('')}</div>`);
+    });
+    if(withKey){
+      newPg();
+      add(`<div class="pdf-h"><h1>${en ? 'Answer key' : 'مفتاح الإجابة'}</h1></div>`);
+      add(`<div class="pdf-k">${randomQuiz.map((q, i) => `${i + 1}-${q.type === 'tf' ? (q.correct ? 'A' : 'B') : (L[q.correct] || '?')}`).join(' &nbsp; ')}</div>`);
+      randomQuiz.forEach((q, i) => add(`<div class="pdf-e"><b>${i + 1}.</b> ${esc(String(q.explanation || '').replace(/\*\*/g, ''))}</div>`));
+    }
+    const pdf = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
+    for(let i = 0; i < pages.length; i++){
+      const cv = await html2canvas(pages[i], {scale:2, backgroundColor:'#ffffff'});
+      if(i) pdf.addPage(); pdf.addImage(cv.toDataURL('image/jpeg', .92), 'JPEG', 0, 0, 210, 297);
+    }
+    holder.remove();
+    await saveOut(safeName(title) + (withKey ? '-اختبار-مع-الإجابات' : '-اختبار') + '.pdf', pdf.output('blob'));
+  }catch(e){ showError('تعذّر إنشاء الـ PDF: ' + e.message); }
+}
+
+/* ===== أسئلة جديدة على نفس الملف + استيراد/تصدير رد الـ AI ===== */
+let contWork = null;
+const qStems = d => { const o = []; [['mcqs','question'], ['clinical','question'], ['true_false','statement'], ['short_answer','question'], ['long_answer','question'], ['flashcards','front']].forEach(([k, f]) => (d[k] || []).forEach(q => { if(q && q[f]) o.push(String(q[f]).replace(/\s+/g, ' ').slice(0, 100)); })); return o; };
+function contSet(title, prev){
+  contWork = {title, prev};
+  $('contBanner').style.display = 'flex'; $('contName').textContent = 'أسئلة جديدة على: ' + title;
+  showToast('تم — الدفعة القادمة جديدة ولن تتكرر السابقة.', true);
+}
+function contCancel(){ contWork = null; $('contBanner').style.display = 'none'; }
+function contFromCurrent(){
+  if(!lastParsed){ showToast('لا يوجد عمل حالي، اختر من المكتبة.'); return; }
+  contSet(lessonTitle(lastParsed, $('sourceText').value.trim()), qStems(lastParsed));
+}
+async function contFromLibrary(){
+  const all = await dbAll(SESS); if(!all.length){ showToast('المكتبة فارغة.'); return; }
+  const g = {}; all.sort((a, b) => b.at - a.at).forEach(s => (g[s.tkey] = g[s.tkey] || []).push(s));
+  sheet('اختر العمل', Object.values(g).map(x => [libEsc(x[0].customName || x[0].title) + (x.length > 1 ? ` (${x.length})` : ''), () => contPick(x)]));
+}
+function contPick(g){
+  const s = g[0];
+  $('sourceText').value = s.text || '';
+  uploadedImage = s.file ? {mimeType: s.file.mimeType, base64: s.file.base64} : null;
+  curFileName = s.file ? s.file.name : null;
+  $('fileStatus').textContent = s.file ? '📎 ' + (s.file.name || 'ملف محفوظ') : '';
+  genLang = s.lang || genLang; $('difficulty').value = s.diff || 'adaptive';
+  contSet(s.title, g.flatMap(x => qStems(x.data))); rmTab('home');
+}
+const _bp0 = buildPromptText;
+buildPromptText = function(inp){
+  return _bp0(inp) + (contWork && contWork.prev.length ? '\n\nأسئلة سبق توليدها على نفس المادة، لا تكررها ولا تعد صياغتها، وغطِّ مواضع وزوايا مختلفة:\n' + contWork.prev.slice(-80).map(x => '- ' + x).join('\n') : '');
+};
+async function pasteExport(){
+  let t = $('pastedResponse').value.trim();
+  if(!t){ if(!lastParsed){ showToast('لا يوجد رد لتصديره.'); return; } t = jsonText(lastParsed, lessonTitle(lastParsed, $('sourceText').value.trim())); }
+  const nm = safeName(contWork ? contWork.title : lessonTitle(lastParsed || {}, $('sourceText').value.trim()));
+  try{ await saveOut(nm + '-رد.txt', new Blob([t], {type:'text/plain;charset=utf-8'})); }catch(e){ showError('تعذّر حفظ الملف: ' + e.message); }
+}
+async function pasteImportFile(inp){
+  const f = inp.files[0]; inp.value = ''; if(!f) return;
+  $('pastedResponse').value = await f.text(); parsePastedResponse('import');
 }
 document.addEventListener('change', e => { if(e.target && e.target.id === 'fileInput') curFileName = e.target.files[0] ? e.target.files[0].name : null; });
 
@@ -1048,16 +1270,39 @@ function rmBar(on){ $('rmBar').style.display = on ? 'flex' : 'none'; document.bo
 function rmGo(m){ showTool('recallman'); rmSetMode(m); }
 let examMode = false, examDone = false, examSec = 0, examTimer = null, flagSet = {}, deckOn = false, deckIdx = 0;
 const fmtT = s => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
-function rmExam(on, noRender){
-  examMode = on; examDone = false; clearInterval(examTimer); examSec = 0;
-  $('exM0').classList.toggle('on', !on); $('exM1').classList.toggle('on', on);
-  $('examTimer').textContent = on ? '00:00' : ''; $('examScore').textContent = ''; $('examEnd').style.display = on ? '' : 'none';
-  if(on) examTimer = setInterval(() => { examSec++; $('examTimer').textContent = fmtT(examSec); }, 1000);
-  if(lastParsed && !noRender){ userAnswers = {mcq:{}, clinical:{}, tf:{}}; renderResults(lastParsed); }
+let tmEnd = 0, tmTot = 0, tmInt = null, tmOnEnd = null, examStarted = false;
+const tmLeft = () => Math.max(0, Math.ceil((tmEnd - Date.now()) / 1000));
+function tmStart(min, onEnd){
+  tmStop(); tmTot = min * 60; tmEnd = Date.now() + tmTot * 1000; tmOnEnd = onEnd;
+  $('tm').style.display = 'flex'; tmTick(); tmInt = setInterval(tmTick, 500);
+  $('tm').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
-function examFinish(){
+function tmStop(){ clearInterval(tmInt); tmInt = null; const t = $('tm'); if(t) t.style.display = 'none'; }
+function tmTick(){
+  const l = tmLeft(), t = $('tm');
+  $('tmTxt').textContent = fmtT(l); $('tmFill').style.width = (l / tmTot * 100) + '%';
+  t.classList.toggle('crit', l <= 60); t.classList.toggle('warn', l > 60 && l <= tmTot * 0.2);
+  if(l <= 0){ const f = tmOnEnd; tmStop(); if(f) f(); }
+}
+function rqTimer(){ const m = parseInt($('rqMin').value); if(!m || m < 1){ showToast('اكتب مدة الاختبار بالدقائق أولًا.'); return; } tmStart(m, () => { showToast('انتهى الوقت'); scoreRandomQuiz(); }); }
+function rmExam(on, noRender){
+  examMode = on; examDone = false; examStarted = false; tmStop();
+  $('exM0').classList.toggle('on', !on); $('exM1').classList.toggle('on', on);
+  $('examCfg').style.display = on ? 'flex' : 'none'; $('examScore').textContent = '';
+  $('resultsWrap').classList.toggle('exlock', on);
+  if(on){ try{ $('exMin').value = localStorage.getItem('rm_exmin') || 30; }catch(e){} }
+  if(lastParsed && !noRender){ userAnswers = {mcq:{}, clinical:{}, tf:{}}; renderResults(lastParsed); updCounts(); }
+}
+function examBegin(){
+  const m = Math.max(1, parseInt($('exMin').value) || 30);
+  try{ localStorage.setItem('rm_exmin', m); }catch(e){}
+  examStarted = true; $('resultsWrap').classList.remove('exlock'); $('examCfg').style.display = 'none';
+  tmStart(m, () => { showToast('انتهى الوقت'); examFinish(true); });
+}
+function examFinish(timeUp){
   if(!examMode || examDone || !lastParsed) return;
-  examDone = true; clearInterval(examTimer);
+  examDone = true;
+  const used = tmInt ? tmTot - tmLeft() : 0; tmStop(); $('resultsWrap').classList.remove('exlock');
   let ok = 0, tot = 0;
   [['mcq','mcqs'], ['clinical','clinical'], ['tf','true_false']].forEach(([type, key]) => {
     const list = lastParsed[key] || [], isTF = type === 'tf';
@@ -1071,13 +1316,19 @@ function examFinish(){
       showExpl(box, expl2(q)); tot++; if(ai === ci) ok++;
     });
   });
-  $('examScore').textContent = `النتيجة: ${ok} / ${tot} · الزمن ${fmtT(examSec)}`;
+  $('examScore').textContent = `${timeUp === true ? 'انتهى الوقت · ' : ''}النتيجة: ${ok} / ${tot}${tot ? ' (' + Math.round(ok / tot * 100) + '%)' : ''}${used ? ' · الزمن ' + fmtT(used) : ''}`;
   showToast('تم تصحيح الامتحان ✓', true);
+}
+function updCounts(){
+  const w = $('resultsWrap'); if(!w) return;
+  $('cnt0').textContent = w.querySelectorAll('[data-y]').length;
+  $('cnt1').textContent = w.querySelectorAll('[data-y="t"]').length;
+  $('cnt2').textContent = w.querySelectorAll('[data-f="1"]').length;
 }
 function addFlag(box, key){
   box.dataset.f = flagSet[key] ? '1' : '0';
   const b = mk('button', 'chip dtl flagbtn' + (flagSet[key] ? ' on' : ''), '🚩 علّم للمراجعة'); b.type = 'button';
-  b.onclick = e => { e.stopPropagation(); flagSet[key] = !flagSet[key]; box.dataset.f = flagSet[key] ? '1' : '0'; b.classList.toggle('on', !!flagSet[key]); };
+  b.onclick = e => { e.stopPropagation(); flagSet[key] = !flagSet[key]; box.dataset.f = flagSet[key] ? '1' : '0'; b.classList.toggle('on', !!flagSet[key]); updCounts(); };
   box.appendChild(b);
 }
 function deckApply(){
@@ -1111,7 +1362,8 @@ const INFO = {
     ['شامل', '70% مواضع الامتحان المعروفة (مقارنات، خط أول، علامات مميزة، موانع) و30% تفاصيل دقيقة واستثناءات.', 'تغطية متوازنة للمحاضرة كلها.'],
     ['الأكثر تكرارًا', '85% من المواضع التي لا يخلو منها امتحان و15% لأهم استثناءاتها.', 'الأنسب لوقت ضيق قبل الامتحان.'],
     ['صيد الفخاخ', 'فخاخ واستثناءات وتشابه لفظي مضلل، وأسئلة تبدو مألوفة وفيها تفصيلة تقلب الإجابة.', 'يرفع دقتك بعد أول مراجعة.'],
-    ['التفريق والتدبير', 'أسئلة عن الفرق بين المتشابهات وترتيب الخطوات (ماذا تفعل أولًا؟).', 'يقوّي القرار السريري والتمييز بين الحالات.']]],
+    ['التفريق والتدبير', 'أسئلة عن الفرق بين المتشابهات وترتيب الخطوات (ماذا تفعل أولًا؟).', 'يقوّي القرار السريري والتمييز بين الحالات.'],
+    ['كل ما سبق', 'يجمع المحاور الأربعة في دفعة واحدة بالتساوي تقريبًا.', 'تغطية أوسع من كل الزوايا في توليد واحد.']]],
   depth: ['عمق الشرح', [
     ['شرح كامل', 'أربعة أجزاء: مفتاح الحل والقرينة، الآلية العلمية، سبب خطأ كل بديل، وفخ الامتحان.', 'تفهم لماذا أخطأت وتتجنب الفخ مرة أخرى.'],
     ['شرح مختصر', 'ثلاث نقاط: سبب صحة الإجابة، استبعاد أقرب بديلين، وخلاصة امتحانية.', 'مراجعة سريعة ليلة الامتحان.']]]
@@ -1345,9 +1597,10 @@ const LIB_DB = 'medicomman_lib', LIB_STORE = 'files', LIB_MAX = 8 * 1024 * 1024;
 
 function libOpen(){
   return new Promise((res, rej) => {
-    const r = indexedDB.open(LIB_DB, 2);
+    const r = indexedDB.open(LIB_DB, 3);
     r.onupgradeneeded = () => {
       if(!r.result.objectStoreNames.contains('sessions')) r.result.createObjectStore('sessions', {keyPath:'id', autoIncrement:true});
+      if(!r.result.objectStoreNames.contains('folders')) r.result.createObjectStore('folders', {keyPath:'id', autoIncrement:true});
       if(!r.result.objectStoreNames.contains(LIB_STORE))
         r.result.createObjectStore(LIB_STORE, {keyPath:'id', autoIncrement:true}).createIndex('name', 'name', {unique:false});
     };
@@ -1685,7 +1938,7 @@ function displayParsedResults(parsed, skipSave){
   activeTab = 'mcq';
   renderResults(parsed);
   $('pastedResponse').value = JSON.stringify(parsed, null, 2);   // لإعادة الاستخدام لاحقًا
-  $('resEmpty').style.display = 'none'; rmTab('res');
+  updCounts(); $('resEmpty').style.display = 'none'; rmTab('res');
   if(!skipSave) sessSave(parsed);
 }
 
@@ -1844,6 +2097,7 @@ function startRandomQuiz(){
 
 function reshuffleRandomQuiz(){
   if(!randomQuiz.length) return;
+  tmStop();
   randomQuiz = shuffleArray(randomQuiz);
   randomAnswers = {};
   randomEvaluated = false;
@@ -1853,6 +2107,7 @@ function reshuffleRandomQuiz(){
 
 function scoreRandomQuiz(){
   if(!randomQuiz.length) return;
+  tmStop();
   randomEvaluated = true;
   renderRandomQuiz();
 }
@@ -1860,7 +2115,7 @@ function scoreRandomQuiz(){
 function renderRandomQuiz(){
   const wrap = $('randomQuizWrap');
   wrap.innerHTML = '';
-  const intro = mk('div', 'card random-quiz-intro', '<h2>الاختبار العشوائي</h2><p class="hint">تم خلط أسئلة MCQ والأسئلة السريرية وأسئلة صح/خطأ معًا. أجب عن كل الأسئلة، ثم اضغط «تقييم الاختبار» لإظهار النتيجة المجمعة.</p>');
+  const intro = mk('div', 'card random-quiz-intro', '<h2>الاختبار العشوائي</h2><p class="hint">تم خلط أسئلة MCQ والأسئلة السريرية وأسئلة صح/خطأ معًا. أجب عن كل الأسئلة، ثم اضغط «تقييم الاختبار» لإظهار النتيجة المجمعة.</p><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0"><label style="margin:0">مدة الاختبار كاملًا (دقيقة، اختياري)</label><input type="number" id="rqMin" min="1" max="600" placeholder="بدون توقيت" style="width:110px"><button type="button" class="btn-secondary" onclick="rqTimer()">ابدأ بالتوقيت</button></div><div class="chips" style="margin:0"><button type="button" class="chip" onclick="exportQuizPdf(0)">PDF: الأسئلة فقط</button><button type="button" class="chip" onclick="exportQuizPdf(1)">PDF: مع المفتاح والتشريح</button></div>');
   intro.style.marginBottom = '16px';
   wrap.appendChild(intro);
 
@@ -1986,14 +2241,14 @@ function parseLooseJson(raw){
   try{ return JSON.parse(t); }catch(e1){ return JSON.parse(repairJsonText(t)); }
 }
 
-function parsePastedResponse(){
+function parsePastedResponse(srcTag){
   clearError();
   const raw = $('pastedResponse').value;
   if(!raw.trim()){ showError('ألصق رد الـ AI أولًا.'); return; }
   let parsed;
   try{ parsed = parseLooseJson(raw); }
   catch(e){ showError('تعذّر قراءة الرد كـ JSON صحيح. (' + e.message + ')'); return; }
-  displayParsedResults(Object.fromEntries(KEYS.map(k => [k, Array.isArray(parsed[k]) ? parsed[k] : []])));
+  displaySrc = srcTag === 'import' ? 'import' : 'paste'; displayParsedResults(normParsed(parsed));
   $('pasteStatus').textContent = 'تم التحويل ✓';
 }
 
@@ -2024,7 +2279,9 @@ const PM_BASE = [
    "استخدم ملف الأسئلة المرفق مصدرًا للأسئلة المطلوب دمجها في الشرح إذا أُرفق مع ملف الكلية.",
    "أدمِج كل سؤال تابع للدرس في موضعه الطبيعي داخل الشرح بجانب المعلومة المتعلقة به، ولا تجمع الأسئلة في قسم منفصل إلا عند الحاجة. ضع الرمز 🌀 قبل كل سؤال مدمج، واكتب رقم السؤال في عنوان H5، ثم نص رأس السؤال كاملًا في عنوان H5 مستقل في السطر التالي، ثم جميع الاختيارات، ثم الإجابة الصحيحة، بهذه الصيغة:\n\n🌀 Q. رقم السؤال\n\nنص رأس السؤال كاملًا\n\nA. ...\nB. ...\nC. ...\nD. ...\n\n✅ Correct answer: (A/B/C/D)\n\nالشرح: وضّح سبب صحة الإجابة، واشرح طريقة الاستدلال عند الحاجة.\n\n⚠️ Exam Trick: اذكر الفخ أو المفتاح الامتحاني إذا كان السؤال يتضمن فخًا حقيقيًا أو فرقًا دقيقًا.\n\nاشرح الاختيارات الخاطئة في جزء الشرح عندما يساعد ذلك على إزالة التباس شائع، دون فرض شرح مطول لكل اختيار في كل سؤال. لا تفرض فقرة Exam Trick إذا لم يكن لها محتوى مفيد.",
    "افحص جميع الأسئلة التابعة للدرس، ولا تكتفِ بالمشهورة منها، وراجع تغطيتها قبل إرسال الشرح النهائي للتأكد من عدم إسقاط أي سؤال.",
-   "احتفظ بكل سؤال في ملف الأسئلة حتى لو تناول نقطة محذوفة أو ملغاة من ملف الكلية المعدّل. اشرح تلك النقطة بالقدر اللازم لفهم السؤال والإجابة عنه فقط، دون إدراجها ضمن المحتوى الأساسي للمنهج، وأدرج السؤال في موضعه المناسب."
+   "احتفظ بكل سؤال في ملف الأسئلة حتى لو تناول نقطة محذوفة أو ملغاة من ملف الكلية المعدّل. اشرح تلك النقطة بالقدر اللازم لفهم السؤال والإجابة عنه فقط، دون إدراجها ضمن المحتوى الأساسي للمنهج، وأدرج السؤال في موضعه المناسب.",
+   {"id": "cx1", "t": "في شرح إجابة كل سؤال من الأسئلة المدمجة داخل الدرس، اكتب الشرح على أربعة مستويات، يبدأ كل مستوى في سطر جديد مستقل بعنوان عريض، ولا يُكمَّل مستوى على سطر المستوى الذي قبله: **1. مفتاح الحل والقرينة الحاسمة** (الكلمة أو المعطى الذي يميّز الإجابة الصحيحة عن أقرب منافس)، ثم **2. الآلية العلمية**، ثم **3. تشريح البدائل الخاطئة ومتى يصح كل منها**، ثم **4. فخ الامتحان**."},
+   {"id": "cx3", "t": "إذا ورد في الدرس مصطلح صعب أو غير شائع، أو جملة إنجليزية معقدة، أو معلومة تحتاج إلى تفسير ولم تُشرح، فاشرح معناها بنفسك بإيجاز داخل النص أو بين قوسين عند الحاجة، وأضف الشرح الناقص من عندك بحيث يكون المعنى واضحًا من أول قراءة دون الحاجة إلى البحث عنه في أداة أخرى. لا تشرح الشائع البديهي، واقتصر على ما يحتاج إلى تفسير فعلًا."}
   ]
  },
  {
@@ -2045,7 +2302,8 @@ const PM_BASE = [
    "عند عرض المعلومات في قوائم نقطية أو مرقمة، لا تضع نقطة نهائية . في نهاية كل عنصر أو الجملة الاخيرة داخل القائمة. اترك نهاية العنصر دون نقطة إذا اكتمل معناها بوضوح، مع الاحتفاظ بعلامات الترقيم الضرورية داخل الجملة، مثل الفواصل والنقطتين وعلامات الاستفهام، وبالنقاط الموجودة داخل الاختصارات والمصطلحات العلمية عند الحاجة. لا تطبّق هذه القاعدة على نحو يخلّ بسلامة النص الإنجليزي أو بصياغة أسئلة الامتحانات واختياراتها أو الإجابات التي تتطلب ترقيمًا معينًا.",
    "فضّل عرض المعلومات في نقاط قصيرة مرتبة ومنظمة بدل الفقرات السردية الطويلة، بحيث تحمل كل نقطة معلومة واحدة واضحة. استخدم الفقرة المتصلة فقط حين يتعذّر تحويل الكلام إلى نقاط دون أن يضيع معناه.",
    "استخدم الجداول لإظهار المعلومات التي يناسبها العرض الجدولي، والمقارنات المباشرة لتوضيح أوجه التشابه والاختلاف، والتجميعات التي تسهّل الحفظ والاسترجاع وتنظّم الملخص. وأكثِر منها في مراجعة الدرس. واستخدم ال blockquotes لإبراز القواعد أو التنبيهات أو الخلاصات المهمة عند الحاجة، عندما تساعد على تنظيم المحتوى أو توضيحه. ولا تستخدم ال Code Block مطلقا.",
-   "استخدم الرموز البصرية الحية بكثرة وانتظام في المواضع التي تساعد على التنظيم أو إبراز المعلومة، وليس في التنبيهات الكبرى فقط، مثل: 🔥 🎯 ⚠️💡🧠 🔍 🧪 💊 🩺🚨 ✅ ❌ 📌 وغيرها الكثير، كلٌّ في موضعه المناسب. مع الحفاظ على الشكل الأكاديمي والتنظيم البصري بوضوح في معظم المحاور، ودون تحويل الصفحة إلى زخرفة، وتجنب وضع عدة رموز بلا وظيفة علمية في السطر نفسه."
+   "استخدم الرموز البصرية الحية بكثرة وانتظام في المواضع التي تساعد على التنظيم أو إبراز المعلومة، وليس في التنبيهات الكبرى فقط، مثل: 🔥 🎯 ⚠️💡🧠 🔍 🧪 💊 🩺🚨 ✅ ❌ 📌 وغيرها الكثير، كلٌّ في موضعه المناسب. مع الحفاظ على الشكل الأكاديمي والتنظيم البصري بوضوح في معظم المحاور، ودون تحويل الصفحة إلى زخرفة، وتجنب وضع عدة رموز بلا وظيفة علمية في السطر نفسه.",
+   {"id": "cx2", "t": "أبرِز الكلمات المفتاحية والمصطلحات المهمة والمعلومات الاستثنائية والجمل المحورية بالخط العريض (Bold) حتى تظهر بوضوح أثناء المراجعة، دون الإفراط في التظليل لدرجة تفقده قيمته؛ فلا يزيد عن بضع كلمات في الفقرة الواحدة."}
   ]
  },
  {
@@ -2074,7 +2332,7 @@ let pmN = 0;
 const PM_BASE_CMDS = PM_BASE.flatMap((g, gi) => g.cmds.map(item => {
   const isObj = item && typeof item === 'object';
   return {
-    id: 'c' + (++pmN),
+    id: (isObj && item.id) || 'c' + (++pmN),
     g: 'g' + (gi + 1),
     t: isObj ? item.t : item,
     off: isObj && 'off' in item ? !!item.off : !!g.off
