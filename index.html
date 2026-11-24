@@ -626,6 +626,16 @@ body.rm-on .page-jumpers{bottom:68px}
 .pdf-tb td span{color:#0F7B73}
 .pdf-x{text-align:center;color:#0F7B73;font-size:20px;margin:14px 0 10px}
 .pdf-eh{font-weight:700;color:#0F7B73}
+
+#contCard .chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#contCard .chip{width:100%;text-align:center;padding:10px 8px}
+.fchip{font-size:11.5px;padding:6px 10px}
+.fchip b{font-size:10.5px;padding:0 6px;margin-inline-start:4px}
+.tab-n{background:rgba(0,0,0,.1);border-radius:10px;padding:0 7px;font-size:.78rem;margin-inline-start:4px}
+.md-body h4{border-bottom:0!important;padding-bottom:0!important}
+.focus-item{border-bottom:1.5px solid var(--line-strong)}
+.focus-item:last-child{border-bottom:none}
+.focus-qnum{display:inline-block;background:linear-gradient(135deg,#0F766E,#155E75);color:#fff;border-radius:10px;padding:3px 14px;font-weight:800;font-size:13px;box-shadow:0 4px 12px rgba(15,118,110,.38);margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -819,7 +829,7 @@ body.rm-on .page-jumpers{bottom:68px}
   <div id="resultsWrap" style="display:none;">
     <div class="res-head"><div class="seg dtl"><button type="button" class="on" id="exM0" onclick="rmExam(false)">وضع المذاكرة</button><button type="button" id="exM1" onclick="rmExam(true)">وضع الامتحان</button></div></div>
     <div class="dtl exam-cfg" id="examCfg" style="display:none"><span class="ex-l">⏱ مدة الامتحان بالدقيقة</span><input type="number" id="exMin" min="1" max="600" value="30"><button type="button" class="ex-go" onclick="examBegin()">ابدأ الامتحان</button></div>
-    <div class="dtl" style="margin-bottom:10px"><button type="button" class="chip" id="exPdf" style="display:none" onclick="exportQuizPdf()">⬇ تصدير الاختبار PDF</button></div>
+    <div class="dtl" style="margin-bottom:10px"><span id="exPdf" style="display:none"><button type="button" class="chip" onclick="exportQuizPdf()">⬇ PDF</button> <button type="button" class="chip" onclick="exportQuizPdf(1)">⬇ PDF بدون شرح</button></span></div>
     <div class="tm" id="tm" style="display:none"><span id="tmTxt">00:00</span><div class="tm-bar"><i id="tmFill"></i></div><button type="button" class="chip" id="examEnd" onclick="examFinish()">إنهاء وتصحيح</button></div>
     <div id="examScore"></div>
     <div class="fstrip dtl" id="fstrip"></div>
@@ -920,7 +930,7 @@ body.rm-on .page-jumpers{bottom:68px}
    ============================================================ */
 
 /* ===== 1) الثوابت ===== */
-const VERSION = 'V13';
+const VERSION = 'V14';
 // تسجيل الأدوات: أداة جديدة = عنصر هنا + <div class="wrap view-hidden" id="tool-ID"> في الصفحة
 const TOOLS = [
   {id:'recallman', icon:'🧠', name:'RecallMan', desc:'حوّل محاضراتك إلى أسئلة متنوعة وبطاقات مراجعة بمستوى صعوبة تختاره.'},
@@ -1110,7 +1120,48 @@ const dbAdd = (st, o) => libTx('readwrite', s => s.add(o), st);
 const dbDel = (st, id) => libTx('readwrite', s => s.delete(id), st);
 const safeName = s => String(s).replace(/[\\\/:*?"<>|]/g, '-').trim().slice(0, 80) || 'MedicoMan';
 const tNorm = t => t.trim().replace(/\s+/g, ' ').toLowerCase();
-const normParsed = p => ({...Object.fromEntries(KEYS.map(k => [k, Array.isArray(p[k]) ? p[k] : []])), lesson_title: p.lesson_title || ''});
+const aliasKey = k => String(k).toLowerCase().replace(/[^a-z0-9]/g, '');
+const KEY_ALIASES = {mcqs:['mcq','mcqs','multiplechoice','multiplechoicequestions','mcqquestions','questions'], clinical:['clinical','clinicals','clinicalcases','clinicalquestions','clinicalscenarios','cases','scenarios'], short_answer:['shortanswer','shortanswers','short','saq','saqs'], long_answer:['longanswer','longanswers','long','essay','essays','leq','leqs'], true_false:['truefalse','tf','trueorfalse','truefalsequestions'], flashcards:['flashcards','flashcard','cards']};
+const toBool = v => { if(typeof v === 'boolean') return v; const s = String(v).trim().toLowerCase(); if(['true','t','yes','صح','صحيح'].includes(s)) return true; if(['false','f','no','خطأ','خطا','غلط'].includes(s)) return false; };
+function fixItem(k, q){
+  if(!q || typeof q !== 'object') return q;
+  const pick = (...n) => { for(const x of n) if(q[x] !== undefined && q[x] !== null) return q[x]; };
+  if(k === 'mcqs' || k === 'clinical'){
+    if(!q.options){ const o = pick('choices', 'answerOptions'); if(Array.isArray(o)) q.options = o; }
+    if(!q.question){ const v = pick('stem', 'text', 'prompt'); if(v !== undefined) q.question = v; }
+    let ci = pick('correct_index', 'correctIndex', 'answer_index', 'answerIndex');
+    if(ci === undefined){
+      const a = pick('correct_answer', 'correctAnswer', 'correct', 'answer');
+      if(typeof a === 'number') ci = a;
+      else if(typeof a === 'string' && Array.isArray(q.options)){
+        const t = a.trim();
+        if(/^[A-Ha-h][\.\):]?$/.test(t)) ci = 'ABCDEFGH'.indexOf(t.charAt(0).toUpperCase());
+        else { const j = q.options.findIndex(o => String(o).trim().toLowerCase() === t.toLowerCase()); if(j >= 0) ci = j; }
+      }
+    }
+    if(typeof ci === 'string' && /^\d+$/.test(ci)) ci = +ci;
+    if(ci !== undefined) q.correct_index = ci;
+  } else if(k === 'true_false'){
+    if(!q.statement){ const v = pick('question', 'text', 'claim'); if(v !== undefined) q.statement = v; }
+    if(typeof q.is_true !== 'boolean'){ const b = toBool(pick('is_true', 'isTrue', 'answer', 'correct', 'correct_answer', 'value')); if(b !== undefined) q.is_true = b; }
+  } else if(k === 'short_answer' || k === 'long_answer'){
+    if(q.answer === undefined){ const v = pick('model_answer', 'modelAnswer', 'answer_text', 'ideal_answer'); if(v !== undefined) q.answer = v; }
+  } else if(k === 'flashcards'){
+    if(!q.front){ const v = pick('question', 'term', 'prompt'); if(v !== undefined) q.front = v; }
+    if(!q.back){ const v = pick('answer', 'definition', 'response'); if(v !== undefined) q.back = v; }
+  }
+  [['exam_yield', 'examYield'], ['key_clue', 'keyClue'], ['topic_tag', 'topicTag']].forEach(([n, alt]) => { if(!q[n] && q[alt]) q[n] = q[alt]; });
+  return q;
+}
+function normParsed(p){
+  const out = {lesson_title: p.lesson_title || p.lessonTitle || p.title || ''}, keys = Object.keys(p);
+  KEYS.forEach(k => {
+    let arr = Array.isArray(p[k]) ? p[k] : null;
+    if(!arr){ const hit = keys.find(x => KEY_ALIASES[k].includes(aliasKey(x)) && Array.isArray(p[x])); arr = hit ? p[hit] : []; }
+    out[k] = arr.map(q => fixItem(k, q));
+  });
+  return out;
+}
 function lessonTitle(d, text){
   const clean = s => String(s || '').replace(/[#*_`>|\[\]]/g, '').replace(/\s+/g, ' ').trim();
   let t = clean(d && d.lesson_title);
@@ -1163,7 +1214,7 @@ function sheet(title, items){
   $('infoOv').classList.add('open');
 }
 function sheetRun(k){ infoClose(); const f = sheetFns[k]; if(f) f(); }
-async function sessMenu(id){ const s = await dbGet(SESS, id); if(!s) return; sheet(s.customName || s.title, [['إعادة تسمية', () => sessRename(id)], ['نقل إلى مجلد…', () => moveTo('s', id)], ['تصدير كـ PDF', () => sessPdf(id)], ['حذف', () => sessDel(id), 1]]); }
+async function sessMenu(id){ const s = await dbGet(SESS, id); if(!s) return; sheet(s.customName || s.title, [['إعادة تسمية', () => sessRename(id)], ['نقل إلى مجلد…', () => moveTo('s', id)], ['تصدير كـ PDF', () => sessPdf(id)], ['تصدير كـ PDF (بدون شرح)', () => sessPdf(id, 1)], ['حذف', () => sessDel(id), 1]]); }
 async function folderMenu(id){ const f = await dbGet(FOLD, id); if(!f) return; sheet(f.name, [['إعادة تسمية', () => folderRename(id)], ['نقل إلى مجلد…', () => moveTo('f', id)], ['حذف المجلد وكل ما فيه', () => folderDelete(id), 1]]); }
 async function sessRename(id){ const s = await dbGet(SESS, id); const n = (prompt('الاسم الجديد', s.customName || s.title) || '').trim(); if(!n) return; s.customName = n; await dbPut(SESS, s); sessRender(); }
 async function folderRename(id){ const f = await dbGet(FOLD, id); const n = (prompt('اسم المجلد', f.name) || '').trim(); if(!n) return; f.name = n; await dbPut(FOLD, f); sessRender(); }
@@ -1236,7 +1287,7 @@ const fromData = d => [
   ...(d.mcqs || []).map(q => ({type:'mcq', question:q.question, options:q.options, correct:q.correct_index, explanation:q.explanation})),
   ...(d.clinical || []).map(q => ({type:'clinical', scenario:q.scenario, question:q.question, options:q.options, correct:q.correct_index, explanation:q.explanation})),
   ...(d.true_false || []).map(q => ({type:'tf', statement:q.statement, correct:q.is_true, explanation:q.explanation}))];
-function pdfText(items, title){
+function pdfText(items, title, noExpl){
   const doc = new window.jspdf.jsPDF({unit:'mm', format:'a4'}), W = 210, H = 297, M = 18, CW = W - 2 * M, T = [15, 123, 115], R = [220, 38, 38];
   let y = 0, pn = 0;
   const head = () => { pn++; doc.setFont('times', 'bold'); doc.setFontSize(10); doc.setTextColor(...T); doc.text(title.slice(0, 70), M, 13); doc.setDrawColor(140); doc.setLineWidth(.6); doc.line(M, 16, W - M, 16); doc.setFont('times', 'normal'); doc.setFontSize(8.5); doc.setTextColor(110); doc.text(String(pn), W / 2, H - 9, {align:'center'}); y = 25; };
@@ -1262,11 +1313,13 @@ function pdfText(items, title){
     }
     y += rh;
   }
-  y += 10; need(24); centerU('Explanations', 15, T);
-  items.forEach((it, i) => { need(18); lines(`Q${i + 1}: ${L4[it.ci]}. ${it.opts[it.ci] || ''}`, 'bold', 11, T, 5.2); lines(it.expl, 'normal', 10.5, [20, 20, 20], 4.9); y += 4; });
+  if(!noExpl){
+    y += 10; need(24); centerU('Explanations', 15, T);
+    items.forEach((it, i) => { need(18); lines(`Q${i + 1}: ${L4[it.ci]}. ${it.opts[it.ci] || ''}`, 'bold', 11, T, 5.2); lines(it.expl, 'normal', 10.5, [20, 20, 20], 4.9); y += 4; });
+  }
   return doc.output('blob');
 }
-async function pdfImg(items, title, rtl){
+async function pdfImg(items, title, rtl, noExpl){
   const holder = document.createElement('div'); holder.style.cssText = 'position:fixed;left:-10000px;top:0'; document.body.appendChild(holder);
   const pages = [], esc = pmEsc; let pg = null;
   const newPg = () => { pg = document.createElement('div'); pg.className = 'pdf-pg'; pg.dir = rtl ? 'rtl' : 'ltr'; holder.appendChild(pg); pages.push(pg); };
@@ -1276,8 +1329,10 @@ async function pdfImg(items, title, rtl){
   add(`<h2 class="pdf-a">${rtl ? 'الإجابات' : 'Answers'}</h2>`);
   const rows = []; for(let i = 0; i < items.length; i += 7) rows.push(items.slice(i, i + 7));
   add(`<table class="pdf-tb">${rows.map((r, ri) => `<tr>${[0, 1, 2, 3, 4, 5, 6].map(c => r[c] ? `<td><b>${ri * 7 + c + 1}.</b> <span>${L4[r[c].ci] || '?'}</span></td>` : '<td></td>').join('')}</tr>`).join('')}</table>`);
-  add(`<h2 class="pdf-x">${rtl ? 'الشرح' : 'Explanations'}</h2>`);
-  items.forEach((it, i) => add(`<div class="pdf-e"><div class="pdf-eh">Q${i + 1}: ${L4[it.ci]}. ${esc(it.opts[it.ci] || '')}</div>${esc(it.expl)}</div>`));
+  if(!noExpl){
+    add(`<h2 class="pdf-x">${rtl ? 'الشرح' : 'Explanations'}</h2>`);
+    items.forEach((it, i) => add(`<div class="pdf-e"><div class="pdf-eh">Q${i + 1}: ${L4[it.ci]}. ${esc(it.opts[it.ci] || '')}</div>${esc(it.expl)}</div>`));
+  }
   const pdf = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
   for(let i = 0; i < pages.length; i++){
     const cv = await html2canvas(pages[i], {scale:2, backgroundColor:'#ffffff'});
@@ -1285,20 +1340,20 @@ async function pdfImg(items, title, rtl){
   }
   holder.remove(); return pdf.output('blob');
 }
-async function makePdf(list, title){
+async function makePdf(list, title, noExpl){
   const items = pdfItems(list); if(!items.length){ showToast('لا توجد أسئلة اختيار لتصديرها.'); return; }
-  const all = title + ' ' + items.map(i => i.stem + ' ' + i.opts.join(' ') + ' ' + i.expl).join(' ');
+  const all = title + ' ' + items.map(i => i.stem + ' ' + i.opts.join(' ') + ' ' + (noExpl ? '' : i.expl)).join(' ');
   try{
     showToast('جارٍ إنشاء الـ PDF…'); await loadJs(JSPDF);
     const img = needImg(all); if(img) await loadJs(H2C);
-    await saveOut(safeName(title) + '.pdf', img ? await pdfImg(items, title, hasAr(all)) : pdfText(items, title));
+    await saveOut(safeName(title) + (noExpl ? '-بدون-شرح' : '') + '.pdf', img ? await pdfImg(items, title, hasAr(all), noExpl) : pdfText(items, title, noExpl));
   }catch(e){ showError('تعذّر إنشاء الـ PDF: ' + e.message); }
 }
-function exportQuizPdf(){
+function exportQuizPdf(noExpl){
   if(!randomQuiz.length){ showToast('ابدأ اختبارًا عشوائيًا أولًا.'); return; }
-  makePdf(randomQuiz, lessonTitle(lastParsed || {}, $('sourceText').value.trim()));
+  makePdf(randomQuiz, lessonTitle(lastParsed || {}, $('sourceText').value.trim()), !!noExpl);
 }
-async function sessPdf(id){ const s = await dbGet(SESS, id); if(s) makePdf(fromData(s.data), s.customName || s.title); }
+async function sessPdf(id, noExpl){ const s = await dbGet(SESS, id); if(s) makePdf(shuffleArray(fromData(s.data)), s.customName || s.title, !!noExpl); }
 
 /* ===== أسئلة جديدة على نفس الملف + استيراد/تصدير رد الـ AI ===== */
 let contWork = null;
@@ -1377,6 +1432,15 @@ function markQ(box, st){
   const o = h.querySelector('.qs'); if(o) o.remove();
   h.insertAdjacentHTML('beforeend', `<span class="qs qs-${st}">${{ok:'✓ إجابة صحيحة', bad:'✗ إجابة خاطئة', skip:'⚠ لم تُجب بعد'}[st]}</span>`);
 }
+
+function rqCfgHtml(){
+  return '<div class="exam-cfg" style="display:flex;margin:10px 0"><span class="ex-l">⏱ مدة الامتحان بالدقيقة</span><input type="number" id="rqMin" min="1" max="600" value="' + randomQuiz.length + '"><button type="button" class="ex-go" onclick="rqExamBegin()">ابدأ الامتحان</button></div><div class="chips" style="margin:0"><button type="button" class="chip" onclick="exportQuizPdf()">تصدير PDF</button><button type="button" class="chip" onclick="exportQuizPdf(1)">تصدير PDF بدون شرح</button></div>';
+}
+function rqExamBegin(){
+  const m = Math.max(1, parseInt($('rqMin').value) || 1);
+  if(examMode && examType === 'random' && !examStarted){ $('exMin').value = m; examBegin(); return; }
+  tmStart(m, () => { showToast('انتهى الوقت'); scoreRandomQuiz(); });
+}
 function examScope(){
   if($('randomModeBtn').classList.contains('active') && randomQuiz.length) return {type:'random', n:randomQuiz.length};
   if(lastParsed && ['mcq', 'clinical', 'tf'].includes(activeTab)) return {type:activeTab, n:(lastParsed[tabDef(activeTab).dataKey] || []).length};
@@ -1428,7 +1492,7 @@ function updCounts(){
   const w = $('resultsWrap'); if(!w) return;
   const bs = [...w.querySelectorAll('[data-y]')], cnt = {};
   bs.forEach(b => { cnt[b.dataset.y] = (cnt[b.dataset.y] || 0) + 1; });
-  const chips = [['all', 'كل الأسئلة', bs.length], ...['high_yield', 'exam_trap', 'core_concept', 'subtle_nuance', 'differential_pivot'].filter(k => cnt[k]).map(k => [k, YIELD_AR[k], cnt[k]]), ['flag', 'المعلّمة للمراجعة', bs.filter(b => b.dataset.f === '1').length]];
+  const chips = [['all', 'كل الأسئلة', bs.length], ['flag', 'المعلّمة للمراجعة', bs.filter(b => b.dataset.f === '1').length], ...['high_yield', 'exam_trap', 'core_concept', 'subtle_nuance', 'differential_pivot'].filter(k => cnt[k]).map(k => [k, YIELD_AR[k], cnt[k]])];
   if(!chips.some(c => c[0] === curFilt)) curFilt = 'all';
   $('fstrip').innerHTML = chips.map(c => `<button type="button" class="fchip${c[0] === curFilt ? ' on' : ''}" onclick="yieldFilter('${c[0]}')">${c[1]} <b>${c[2]}</b></button>`).join('');
   bs.forEach(b => { b.style.display = (curFilt === 'all' || (curFilt === 'flag' ? b.dataset.f === '1' : b.dataset.y === curFilt)) ? '' : 'none'; });
@@ -2004,7 +2068,8 @@ function buildTabs(parsed){
   available.forEach(t => {
     const el = mk('div', 'tab' + (t.key === activeTab ? ' active' : ''), '');
     el.id = 'tab_' + t.key;
-    el.textContent = t.label;
+    el.textContent = t.label + ' ';
+    el.appendChild(mk('b', 'tab-n', String((parsed[t.dataKey] || []).length)));
     el.onclick = () => showTab(t.key);
     bar.appendChild(el);
   });
@@ -2036,7 +2101,7 @@ function renderResults(parsed){
 }
 
 function displayParsedResults(parsed, skipSave){
-  fixOpts(parsed); flagSet = {}; curFilt = 'all'; rmExam(false, true); deckOn = false;
+  parsed = normParsed(parsed); fixOpts(parsed); flagSet = {}; curFilt = 'all'; rmExam(false, true); deckOn = false;
   resultsCache = {ar:null, en:null, mixed:null};
   resultsCache[genLang] = parsed;
   lastParsed = parsed;
@@ -2224,7 +2289,7 @@ function scoreRandomQuiz(){
 function renderRandomQuiz(){
   const wrap = $('randomQuizWrap');
   wrap.innerHTML = '';
-  const intro = mk('div', 'card random-quiz-intro', '<h2>الاختبار العشوائي</h2><p class="hint">تم خلط أسئلة MCQ والأسئلة السريرية وأسئلة صح/خطأ معًا. أجب عن كل الأسئلة، ثم اضغط «تقييم الاختبار» لإظهار النتيجة المجمعة.</p><div class="chips" style="margin:0"><button type="button" class="chip" onclick="exportQuizPdf()">تصدير PDF</button></div>');
+  const intro = mk('div', 'card random-quiz-intro', '<h2>الاختبار العشوائي</h2><p class="hint">تم خلط أسئلة MCQ والأسئلة السريرية وأسئلة صح/خطأ معًا. أجب عن كل الأسئلة، ثم اضغط «تقييم الاختبار» لإظهار النتيجة المجمعة.</p>' + rqCfgHtml());
   intro.style.marginBottom = '16px';
   wrap.appendChild(intro);
 
